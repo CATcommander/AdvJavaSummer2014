@@ -231,6 +231,12 @@ public class Project1 {
         boolean hasREADMEFlag = false;
         boolean hasNoFlag = false;
 
+        for (String str: args){
+            if (str.compareToIgnoreCase("-README") == 0){
+                handlePrintREADME();
+            }
+        }
+
         if (args.length < 8 || args.length > 10)
             printUsageAndExit("Not enough or too many command line arguments");
 
