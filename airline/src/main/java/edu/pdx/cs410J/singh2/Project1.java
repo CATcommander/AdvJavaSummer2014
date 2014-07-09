@@ -2,9 +2,6 @@ package edu.pdx.cs410J.singh2;
 
 import edu.pdx.cs410J.AbstractAirline;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
  * The main class for the CS410J airline Project
  */
@@ -23,8 +20,9 @@ public class Project1 {
                         "\n-README       Prints a README for this project and exits";
 
     private static final String INVALID_FN = "Invalid Flight Number";
-    private static final String INVALID_SRC = "Invalid departure airport code";
-    private static final String INVALID_DATE = "Invalid date";
+    private static final String INVALID_SRC = "Invalid Departure Airport Code";
+    private static final String INVALID_DATE = "Invalid Date";
+    private static final String INVALID_TIME = "Invalid Time";
 
     private static void printREADME() {
         System.out.println("\n in function printREADME");
@@ -39,7 +37,6 @@ public class Project1 {
         Flight flight = new Flight(flightNumber, args[3], args[4], args[5], args[6]);
         airline.addFlight(flight);
 
-//      System.out.println(airline.toString());
         System.out.println(flight.toString());
     }
 
@@ -62,36 +59,95 @@ public class Project1 {
 
         } catch (NumberFormatException ex) {
             printUsageAndExit(INVALID_FN);
-            throw new AssertionError("This statement is unreachable. It should never get here");
+            throw new AssertionError("Unreachable statement");
         }
 
         if (flightNumber < 0) {
             printUsageAndExit(INVALID_FN);
-            throw new AssertionError("This statement is unreachable. It should never get here");
+            throw new AssertionError("Unreachable statement");
         }
 
         return flightNumber;
     }
 
     /**
-     * Validate the date so the date format is mm/dd/yyyy hh:mmm
+     * Validate the date so the date format is mm/dd/yyyy
+     * if <code>args</code> is invalid, the program exits
      * @param args
-     *        the date and time of departure/arrival
+     *        the date of departure/arrival
+     * @return date
+     *         return of valid date
      */
 
-    private static void validateDate(String args) {
+    private static String validateDate(String args) {
 
-        String space[] = args.split(" ");
+        String date[] = args.split("/");
+        int month, day, year;
 
-        //String date[] = space[0].split("/");
-       // String time[] = space[1].split(" ");
+        try {
 
-        System.out.println(space[0]);// date[0]);// + time.toString());
+            month = Integer.parseInt(date[0]);
+            day = Integer.parseInt(date[1]);
+            year = Integer.parseInt(date[2]);
 
-        SimpleDateFormat format = new SimpleDateFormat("mm/dd/yyyy hh:mm");
+        } catch (NumberFormatException ex) {
+            printUsageAndExit(INVALID_DATE);
+            throw new AssertionError("Unreachable statement");
+        }
 
 
+        if (month < 1 && month > 12) {
+            printUsageAndExit(INVALID_DATE);
+            throw new AssertionError("Unreachable statement");
+        }
 
+        if (day < 1 && day > 31) {
+            printUsageAndExit(INVALID_DATE);
+            throw new AssertionError("Unreachable statement");
+        }
+
+        if (year < 1800 && year > 3000) {
+            printUsageAndExit(INVALID_DATE);
+            throw new AssertionError("Unreachable statement");
+        }
+
+        return month + "/" + day + "/" + year;
+    }
+
+    /**
+     * Validates the time format. if <code>args</code> is not
+     * valid time, program exits
+     * @param args
+     *        the time in 24-hour format (string to parse)
+     * @return
+     *        validated time
+     */
+    private static String validateTime(String args) {
+        String time[] = args.split(":");
+        int hour, minute;
+
+        try {
+
+            hour = Integer.parseInt(time[0]);
+            minute = Integer.parseInt(time[1]);
+
+        } catch (NumberFormatException ex) {
+            printUsageAndExit(INVALID_TIME);
+            throw new AssertionError("Unreachable statement");
+        }
+
+
+        if (hour > 24 || hour < 0) {
+            printUsageAndExit(INVALID_TIME);
+            throw new AssertionError("Unreachable statement");
+        }
+
+        if (minute > 60 || minute < 0) {
+            printUsageAndExit(INVALID_TIME);
+            throw new AssertionError("Unreachable statement");
+        }
+
+        return hour + ":" + minute;
     }
 
     /**
@@ -108,7 +164,13 @@ public class Project1 {
         System.exit(1);
     }
 
+    private static void validateThreeLetterCode(String arg) {
+
+    }
     public static void main(String[] args) {
+        if (args.length < 6)
+            printUsageAndExit("Not enough command line arguments");
+
         for (String s: args) {
             if (s.contains("-README")){
                 printREADME();
@@ -118,7 +180,7 @@ public class Project1 {
             }
             else if(!s.contains("-README") && !s.contains("-print")){
                 validateDate(args[3]);
-
+                break;
             }
         }
 
