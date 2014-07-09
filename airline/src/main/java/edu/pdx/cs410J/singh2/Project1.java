@@ -20,7 +20,7 @@ public class Project1 {
                         "\n-README       Prints a README for this project and exits";
 
     private static final String INVALID_FN = "Invalid Flight Number";
-    private static final String INVALID_SRC = "Invalid Departure Airport Code";
+    private static final String INVALID_CODE = "Invalid Three-letter Code";
     private static final String INVALID_DATE = "Invalid Date";
     private static final String INVALID_TIME = "Invalid Time";
 
@@ -30,11 +30,21 @@ public class Project1 {
 
     private static void printFlag(String []args) {
         int flightNumber;
+        String name = args[1];
+        String src, dest;
+        String departDate, departTime;
+        String arriveDate, arriveTime;
 
+        Airline airline = new Airline(name);
         flightNumber = validateFlightNumber(args[2]);
-        Airline airline = new Airline(args[1]);
+        src = validateThreeLetterCode(args[3]);
+        departDate = validateDate(args[4]);
+        departTime = validateTime(args[5]);
+        dest = validateThreeLetterCode(args[6]);
+        arriveDate = validateDate(args[7]);
+        arriveTime = validateTime(args[8]);
 
-        Flight flight = new Flight(flightNumber, args[3], args[4], args[5], args[6]);
+        Flight flight = new Flight(flightNumber, src, departDate + " " + departTime, dest, arriveDate + " " + arriveTime);
         airline.addFlight(flight);
 
         System.out.println(flight.toString());
@@ -95,18 +105,17 @@ public class Project1 {
             throw new AssertionError("Unreachable statement");
         }
 
-
-        if (month < 1 && month > 12) {
+        if (month < 1 || month > 12) {
             printUsageAndExit(INVALID_DATE);
             throw new AssertionError("Unreachable statement");
         }
 
-        if (day < 1 && day > 31) {
+        if (day < 1 || day > 31) {
             printUsageAndExit(INVALID_DATE);
             throw new AssertionError("Unreachable statement");
         }
 
-        if (year < 1800 && year > 3000) {
+        if (year < 1800 || year > 3000) {
             printUsageAndExit(INVALID_DATE);
             throw new AssertionError("Unreachable statement");
         }
@@ -164,11 +173,19 @@ public class Project1 {
         System.exit(1);
     }
 
-    private static void validateThreeLetterCode(String arg) {
+    private static String validateThreeLetterCode(String arg) {
+        if (arg.length() != 3) {
+            printUsageAndExit(INVALID_CODE);
+            throw new AssertionError("Unreachable statement");
+        }
 
+        String code = arg.toUpperCase();
+        code.toString();
+
+        return code;
     }
     public static void main(String[] args) {
-        if (args.length < 6)
+        if (args.length < 8)
             printUsageAndExit("Not enough command line arguments");
 
         for (String s: args) {
@@ -179,7 +196,7 @@ public class Project1 {
                 printFlag(args);
             }
             else if(!s.contains("-README") && !s.contains("-print")){
-                validateDate(args[3]);
+                //validateDate(args[3]);
                 break;
             }
         }
