@@ -15,3 +15,7 @@ hs_err_pid*
 *.iml
 *.iws
 *.idea
+
+*/target/*
+*/dependency-reduced-pom.xml
+*/.idea/*

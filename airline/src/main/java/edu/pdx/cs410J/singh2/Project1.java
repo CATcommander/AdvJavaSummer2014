@@ -26,9 +26,9 @@ public class Project1 {
         System.out.println("\nAuthor\n-------\nHarmanpreet Singh\nProject1\nCS410J\n7/9/2014\n");
         System.out.println("What is it?\n-----------");
         System.out.println("A simple basic program that keeps track of Flights. Flight can be created" +
-        "\nand added to Airline database. An Airline has a name that consists of multiples flights." +
-        "\nEach Flight departs from a source and leaves at a given departure time and arrives at the" +
-        "\ndestination at given arrival time.");
+                        "\nand added to Airline database. An Airline has a name that consists of" +
+                        "\nmultiples flights. Each Flight departs from a source and leaves at a" +
+                        "\ngiven departure time and arrives at the destination at given arrival time.");
 
         System.out.println("\nHow to run?\n----------\nBefore running the application, read the USAGE section below. " +
                 "To run this program \nenter the following on a terminal or command prompt:");
