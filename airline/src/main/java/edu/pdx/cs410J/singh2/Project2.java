@@ -3,26 +3,28 @@ package edu.pdx.cs410J.singh2;
 /**
  * The main class for the CS410J airline Project
  */
-public class Project1 {
+public class Project2 {
 
-    private static final String USAGE="usage: java edu.pdx.cs410J.singh2.Project1 [options] <args>" +
+    public static final String USAGE="usage: java edu.pdx.cs410J.singh2.Project1 [options] <args>" +
                         "\nargs are (in this order):" +
-                        "\nname          The name of the airline" +
-                        "\nflightNumber  The flight number" +
-                        "\nsrc           Three-letter code of departure airport" +
-                        "\ndepartTime    Departure date and time (24-hour time)" +
-                        "\ndest          Three-letter code of arrival airport" +
-                        "\narriveTime    Arrival date and time (24-hour time)" +
+                        "\nname             The name of the airline" +
+                        "\nflightNumber     The flight number" +
+                        "\nsrc              Three-letter code of departure airport" +
+                        "\ndepartTime       Departure date and time (24-hour time)" +
+                        "\ndest             Three-letter code of arrival airport" +
+                        "\narriveTime       Arrival date and time (24-hour time)" +
                         "\noptions are (options may appear in any order):" +
-                        "\n-print        Prints a description of the new flight" +
-                        "\n-README       Prints a README for this project and exits";
+                        "\n-textFile file   Where to read/write the airline info" +
+                        "\n-print           Prints a description of the new flight" +
+                        "\n-README          Prints a README for this project and exits";
 
-    private static final String INVALID_FN = "Invalid Flight Number";
-    private static final String INVALID_CODE = "Invalid Three-letter Code";
-    private static final String INVALID_DATE = "Invalid Date Format. Must be in mm/dd/yyyy";
-    private static final String INVALID_TIME = "Invalid Time Format. Must in 24-hour time";
+    public static final String INVALID_FN = "Invalid Flight Number";
+    public static final String INVALID_CODE = "Invalid Three-letter Code";
+    public static final String INVALID_DATE = "Invalid Date Format. Must be in mm/dd/yyyy";
+    public static final String INVALID_TIME = "Invalid Time Format. Must in 24-hour time";
+    public static final String INVALID_FILE = "Invalid File. Must be a .txt file";
 
-    private static void handlePrintREADME() {
+    public static void handlePrintREADME() {
         System.out.println("\nAuthor\n-------\nHarmanpreet Singh\nProject1\nCS410J\n7/9/2014\n");
         System.out.println("What is it?\n-----------");
         System.out.println("A simple basic program that keeps track of Flights. Flight can be created" +
@@ -47,8 +49,9 @@ public class Project1 {
      * @param args
      *        string of args with print flag
      */
-    private static void handlePrintFlag(String[] args) {
+    public static void handlePrintFlag(String[] args) {
         int flightNumber;
+
         String name = args[1];
         String src, dest;
         String departDate, departTime;
@@ -70,6 +73,7 @@ public class Project1 {
         System.out.println(flight.toString());
     }
 
+
     /**
      * This function validates if flightNumber is valid integer. If flight number is not a valid integer,
      * the program exits with a user-friendly error message.
@@ -80,7 +84,7 @@ public class Project1 {
      *         parsed value of integer
      */
 
-    private static int validateFlightNumber(String arg) {
+    public static int validateFlightNumber(String arg) {
         int flightNumber;
 
         try {
@@ -109,7 +113,7 @@ public class Project1 {
      *         returns the valid date in correct format (mm/dd/yyyy)
      */
 
-    private static String validateDate(String args) {
+    public static String validateDate(String args) {
 
         String date[] = args.split("/");
         int month, day, year;
@@ -157,7 +161,7 @@ public class Project1 {
      * @return
      *        returns the validated time in correct format (hh:mm)
      */
-    private static String validateTime(String args) {
+    public static String validateTime(String args) {
         String time[] = args.split(":");
         int hour, minute;
 
@@ -189,7 +193,7 @@ public class Project1 {
      * @param errorMessage
      *        the error message to print
      */
-    private static void printUsageAndExit(String errorMessage) {
+    public static void printUsageAndExit(String errorMessage) {
 
         System.err.println(errorMessage);
         System.err.println();
@@ -206,7 +210,7 @@ public class Project1 {
      * @return
      *        validated parsed three letter code in upper case
      */
-    private static String validateThreeLetterCode(String arg) {
+    public static String validateThreeLetterCode(String arg) {
 
         for (char c: arg.toCharArray()) {
             if (arg.length() != 3 && Character.isDigit(c)) {
@@ -230,6 +234,7 @@ public class Project1 {
         boolean hasPrintFlag = false;
         boolean hasREADMEFlag = false;
         boolean hasNoFlag = false;
+        boolean textFileFlag = false;
 
         /* if command line argument contains only README */
         for (String str : args) {
@@ -241,17 +246,27 @@ public class Project1 {
         if (args.length < 8 || args.length > 10)
             printUsageAndExit("Not enough or too many command line arguments");
 
+        int counter = 0;
+        int location = 0;
         /* loop through the args to check if options exist(options can be in any order) */
         for (String s : args) {
+            counter++;
             if (s.compareToIgnoreCase("-README") == 0) {
                 hasREADMEFlag = true;
             } else if (s.compareToIgnoreCase("-print") == 0) {
                 hasPrintFlag = true;
-            } else if (s.compareToIgnoreCase("-README") != 0 && s.compareToIgnoreCase("-print") != 0) {
+            } else if (s.compareToIgnoreCase("-README") != 0 && s.compareToIgnoreCase("-print") != 0
+                    && s.compareToIgnoreCase("-textFile") !=0) {
                 hasNoFlag = true;
             }
+            else if (s.compareToIgnoreCase("-textFile") == 0) {
+                textFileFlag = true;
+                location = counter;
+                System.out.println("textfile");
+            }
 
-            if (s.compareToIgnoreCase("-README") != 0 && s.compareToIgnoreCase("-print") != 0 && s.matches("-.*")) {
+            if (s.compareToIgnoreCase("-README") != 0 && s.compareToIgnoreCase("-print") != 0 &&
+                    s.compareToIgnoreCase("-textFile") !=0 && s.matches("-.*")) {
                 printUsageAndExit("Invalid Option");
             }
 
@@ -263,22 +278,27 @@ public class Project1 {
         }
 
         /* if print flag is detected and args length is greater than 9 that means we have unknown args */
-        if (hasNoFlag && hasPrintFlag && args.length > 9) {
-            printUsageAndExit("Unknown command line argument");
+        if (textFileFlag && hasNoFlag && hasPrintFlag && args.length > 10) {
+            printUsageAndExit("Unknown command line argument first");
         }
 
         /* if -print flag is detected, call printFlag to print the description of the project */
-        if (hasPrintFlag) {
+        if (hasPrintFlag && !textFileFlag) {
             handlePrintFlag(args);
         }
 
         /* if no flag and no print flag and argument length is greater than 8 with unknown arg */
-        if (hasNoFlag && !hasPrintFlag && args.length > 8) {
-            printUsageAndExit("Unknown command line argument");
+        if (hasNoFlag && !textFileFlag && !hasPrintFlag && args.length > 8) {
+            printUsageAndExit("Unknown command line argument second");
+        }
+
+        /* if textFile is given then check if print flag is given as well*/
+        if (textFileFlag && hasPrintFlag) {
+            System.out.println("textfile and print flag");
         }
 
         /* if there is no print flag is given */
-        if (hasNoFlag && !hasPrintFlag) {
+        if (hasNoFlag && !hasPrintFlag && !textFileFlag) {
             int flightNumber;
             String name = args[0];
             String src, dest;
