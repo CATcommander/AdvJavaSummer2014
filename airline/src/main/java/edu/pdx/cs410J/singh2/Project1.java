@@ -231,8 +231,9 @@ public class Project1 {
         boolean hasREADMEFlag = false;
         boolean hasNoFlag = false;
 
-        for (String str: args){
-            if (str.compareToIgnoreCase("-README") == 0){
+        /* if command line argument contains only README */
+        for (String str : args) {
+            if (str.compareToIgnoreCase("-README") == 0) {
                 handlePrintREADME();
             }
         }
@@ -241,20 +242,19 @@ public class Project1 {
             printUsageAndExit("Not enough or too many command line arguments");
 
         /* loop through the args to check if options exist(options can be in any order) */
-        for (String s: args) {
-            if (s.compareToIgnoreCase("-README") == 0){
+        for (String s : args) {
+            if (s.compareToIgnoreCase("-README") == 0) {
                 hasREADMEFlag = true;
-            }
-            else if (s.compareToIgnoreCase("-print") == 0) {
+            } else if (s.compareToIgnoreCase("-print") == 0) {
                 hasPrintFlag = true;
-            }
-            else if (s.compareToIgnoreCase("-README") != 0 && s.compareToIgnoreCase("-print") != 0){
+            } else if (s.compareToIgnoreCase("-README") != 0 && s.compareToIgnoreCase("-print") != 0) {
                 hasNoFlag = true;
             }
 
             if (s.compareToIgnoreCase("-README") != 0 && s.compareToIgnoreCase("-print") != 0 && s.matches("-.*")) {
                 printUsageAndExit("Invalid Option");
             }
+
         }
 
         /* if README flag is detected, print A README for this project and exit */
@@ -262,13 +262,23 @@ public class Project1 {
             handlePrintREADME();
         }
 
+        /* if print flag is detected and args length is greater than 9 that means we have unknown args */
+        if (hasNoFlag && hasPrintFlag && args.length > 9) {
+            printUsageAndExit("Unknown command line argument");
+        }
+
         /* if -print flag is detected, call printFlag to print the description of the project */
         if (hasPrintFlag) {
             handlePrintFlag(args);
         }
 
-        // if there is no print flag is given
-        if (hasNoFlag && hasPrintFlag == false) {
+        /* if no flag and no print flag and argument length is greater than 8 with unknown arg */
+        if (hasNoFlag && !hasPrintFlag && args.length > 8) {
+            printUsageAndExit("Unknown command line argument");
+        }
+
+        /* if there is no print flag is given */
+        if (hasNoFlag && !hasPrintFlag) {
             int flightNumber;
             String name = args[0];
             String src, dest;
