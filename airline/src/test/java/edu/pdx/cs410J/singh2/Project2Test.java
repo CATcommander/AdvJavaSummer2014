@@ -4,6 +4,7 @@ import edu.pdx.cs410J.AbstractAirline;
 import edu.pdx.cs410J.InvokeMainTestCase;
 import edu.pdx.cs410J.ParserException;
 import jdk.nashorn.internal.ir.annotations.Ignore;
+import junit.framework.Assert;
 import org.junit.Test;
 
 import java.io.*;
@@ -76,7 +77,7 @@ public class Project2Test extends InvokeMainTestCase {
             AbstractAirline notUsed = parser.parse();
             assertTrue(false);
         } catch (ParserException e) {
-            assertEquals(e.getMessage(), "FILE READ ERROR: 'DoNotUseThisFile' IS AN EMPTY FILE");
+            assertEquals(e.getMessage(), "File Read Error: Empty File");
         }
         deleteFile();
     }
@@ -91,20 +92,32 @@ public class Project2Test extends InvokeMainTestCase {
     }
 
     @Test
-    public void testReadWithBadAirportCode() throws IOException {
-        createFile("Foo\n101 pdx 01/01/2001 01:00 SEA 01/01/2001 01:40");
+    public void testFlightNumber() throws IOException {
+        createFile("Foo\nInvalidFlight pdx 1/1/2012 12:11 sea 01/1/2011 11:11");
+        try {
+            AbstractAirline use = parser.parse();
+            assertTrue(false);
+        } catch (ParserException e) {
+            assertEquals(e.getMessage(), "File Read Error: Invalid Flight Number");
+        }
+    }
+
+    @Test
+    public void testReadWithBadSourceAirportCode() throws IOException {
+        createFile("Foo\n101 123code 01/12/2001 01:00 SEA 01/01/2001 01:40");
         try {
             AbstractAirline notUsed = parser.parse();
             assertTrue(false);
         } catch (ParserException e) {
-            assertEquals(e.getMessage(), "File Read Error");
+            assertEquals(e.getMessage(), "File Read Error: Invalid Three-Letter source code");
         }
-        deleteFile();
     }
+
+//    @Test
 
     @Test
     public void testReadWithBadDate() throws IOException {
-        createFile("Foo\n10aa pdx 01/32/2011 01:00 SEA 01/01/2001 01:40");
+        createFile("Foo\n10 pdx 01/39/2011 01:00 SEA 01/01/2001 01:40");
         try {
             AbstractAirline notUsed = parser.parse();
             assertTrue(false);
@@ -116,7 +129,7 @@ public class Project2Test extends InvokeMainTestCase {
 
     @Test
     public void testReadWithBadDate2() throws IOException {
-        createFile("Foo Airlines\n101\nPDX\n1/01/20/1 1:00\nSEA\n01/01/2001 01:40");
+        createFile("\"Foo Airlines\"\n101 PDX 1/01/20/1 1:00 SEA 01/01/2001 01:40");
         try {
             AbstractAirline notUsed = parser.parse();
             Collection<Flight> flights = notUsed.getFlights();
@@ -127,7 +140,7 @@ public class Project2Test extends InvokeMainTestCase {
         } catch (ParserException e) {
             assertEquals(e.getMessage(), "FILE READ ERROR: '1/01/20/1 1:00' IS NOT A VALID DATE AND TIME");
         }
-        deleteFile();
+       // deleteFile();
     }
 
     @Test
