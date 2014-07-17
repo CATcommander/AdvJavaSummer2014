@@ -16,6 +16,12 @@ public class TextParser implements AirlineParser {
 
     String fileName;
 
+    /* source: http://www.mkyong.com/regular-expressions/how-to-validate-time-in-24-hours-format-with-regular-expression/
+    * */
+    private static final String DATE_FORMAT = "(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\\\d\\\\d)";
+    private static final String TIME_FORMAT = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
+    private static final String SRC_FORMAT = "[A-Z][a-z]{3}";
+
     public TextParser(String fileName) {
         this.fileName = fileName;
         // abstractAirline = new Airline(fileName);
@@ -55,23 +61,53 @@ public class TextParser implements AirlineParser {
                 String []args;
                 args = str.split(" ");
 
-                flightNumber = Project2.validateFlightNumber(args[0]);
-                src = Project2.validateThreeLetterCode(args[1]);
-                departDate = Project2.validateDate(args[2]);
-                departTime = Project2.validateTime(args[3]);
-                dest = Project2.validateThreeLetterCode(args[4]);
-                arriveDate = Project2.validateDate(args[5]);
-                arriveTime = Project2.validateTime(args[6]);
+                src = args[1];
+                departDate = args[2];
+                departTime = args[3];
+                dest = args[4];
+                arriveDate = args[5];
+                arriveTime = args[6];
 
-                System.out.println(flight.toString());
+                try {
+                    flightNumber = Integer.parseInt(args[0]);
+                } catch (NumberFormatException e) {
+                    throw new ParserException("Invalid Flight number");
+                }
+
+                if (!src.matches(SRC_FORMAT)) {
+                    throw new ParserException("Invalid Three-letter source code");
+                }
+
+                if (!departDate.matches(DATE_FORMAT)) {
+                    throw new ParserException("Invalid Date format");
+                }
+
+                if (!departTime.matches(TIME_FORMAT)) {
+                    throw new ParserException("Invalid Time format");
+                }
+
+                if (!dest.matches(SRC_FORMAT)) {
+                    throw new ParserException("Invalid Three-letter destination code");
+                }
+
+                if (!arriveDate.matches(DATE_FORMAT)) {
+                    throw new ParserException("Invalid Date format");
+                }
+
+                if (!arriveTime.matches(TIME_FORMAT)) {
+                    throw new ParserException("Invalid Time format");
+                }
+
                 flight = new Flight(flightNumber, src, departDate + " " + departTime, dest, arriveDate + " " + arriveTime);
 
                 airline.addFlight(flight);
             }
             bufferedReader.close();
 
-        } catch(IOException ex) {
+        } catch (IOException ex) {
             System.err.println("File Read Error");
+        } catch (ParserException ex) {
+            throw new ParserException("File Read Error");
         }
 
         return airline;

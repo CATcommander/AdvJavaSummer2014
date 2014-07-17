@@ -1,9 +1,11 @@
 package edu.pdx.cs410J.singh2;
 
 import edu.pdx.cs410J.AbstractAirline;
+import edu.pdx.cs410J.AbstractFlight;
 import edu.pdx.cs410J.AirlineDumper;
 
 import java.io.*;
+import java.util.ArrayList;
 
 /**
   takes the contents of an airline and writes it out to a text file
@@ -37,13 +39,25 @@ public class TextDumper implements AirlineDumper {
         String read;
 
         try {
+            ArrayList<AbstractFlight> flightList;
+            flightList = (ArrayList<AbstractFlight>)airline.getFlights();
 
             outFile = new File(fileName);
             fileWriter = new FileWriter(outFile);
             bufferedWriter = new BufferedWriter(fileWriter);
 
+            bufferedWriter.write(airline.getName());
+            bufferedWriter.write("\n");
 
-            //if ()
+            for (AbstractFlight flight: flightList) {
+                System.out.println(flight.toString());
+                bufferedWriter.write(flight.getNumber() + " ");
+                bufferedWriter.write(flight.getSource() + " ");
+                bufferedWriter.write(flight.getDestination() + " ");
+                bufferedWriter.write(flight.getDepartureString() + " ");
+                bufferedWriter.write(flight.getArrivalString());
+
+            }
 
             bufferedWriter.flush();
             bufferedWriter.close();

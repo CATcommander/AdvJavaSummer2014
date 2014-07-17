@@ -1,5 +1,10 @@
 package edu.pdx.cs410J.singh2;
 
+import edu.pdx.cs410J.AbstractAirline;
+import edu.pdx.cs410J.ParserException;
+
+import java.io.IOException;
+
 /**
  * The main class for the CS410J airline Project
  */
@@ -213,7 +218,7 @@ public class Project2 {
     public static String validateThreeLetterCode(String arg) {
 
         for (char c: arg.toCharArray()) {
-            if (arg.length() != 3 && Character.isDigit(c)) {
+            if (arg.length() != 3 || Character.isDigit(c)) {
                 printUsageAndExit(INVALID_CODE);
                 throw new AssertionError("Unreachable statement");
             }
@@ -243,7 +248,7 @@ public class Project2 {
             }
         }
 
-        if (args.length < 8 || args.length > 10)
+        if (args.length < 8 || args.length > 11)
             printUsageAndExit("Not enough or too many command line arguments");
 
         int counter = 0;
@@ -272,6 +277,27 @@ public class Project2 {
 
         }
 
+        /* if textFile is given then check if print flag is given as well*/
+        if (textFileFlag && hasPrintFlag) {
+            System.out.println("textfile and print flag");
+        }
+        else if (textFileFlag) {
+            System.out.println("checking textfile");
+            TextParser textParser = new TextParser(args[location]);
+            TextDumper textDumper = new TextDumper(args[location]);
+            AbstractAirline airline;
+
+            try {
+                airline = textParser.parse();
+                textDumper.dump(airline);
+
+            } catch(ParserException pe) {
+                System.out.println("File Read Error1");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         /* if README flag is detected, print A README for this project and exit */
         if (hasREADMEFlag) {
             handlePrintREADME();
@@ -292,10 +318,7 @@ public class Project2 {
             printUsageAndExit("Unknown command line argument second");
         }
 
-        /* if textFile is given then check if print flag is given as well*/
-        if (textFileFlag && hasPrintFlag) {
-            System.out.println("textfile and print flag");
-        }
+
 
         /* if there is no print flag is given */
         if (hasNoFlag && !hasPrintFlag && !textFileFlag) {
