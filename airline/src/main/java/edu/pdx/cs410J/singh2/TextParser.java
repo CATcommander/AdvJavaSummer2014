@@ -25,7 +25,6 @@ public class TextParser implements AirlineParser {
 
     public TextParser(String fileName) {
         this.fileName = fileName;
-        // abstractAirline = new Airline(fileName);
     }
 
     public AbstractAirline parse() throws ParserException {
@@ -53,6 +52,11 @@ public class TextParser implements AirlineParser {
                 throw new ParserException("File Read Error: Empty File");
 
             str = bufferedReader.readLine();
+            System.out.println(str);
+
+            if (str.contains(":") || str.contains("/") || str.matches("\\p{Punct}"))
+                throw new ParserException("Invalid Format");
+
             airline = new Airline(str);
 
             int flightNumber;
@@ -61,6 +65,7 @@ public class TextParser implements AirlineParser {
             String arriveDate, arriveTime;
 
             while((str = bufferedReader.readLine()) != null) {
+
                 // read flight information
                 // store into listOfFlights
                 String []args;
@@ -73,13 +78,6 @@ public class TextParser implements AirlineParser {
                 arriveDate = args[5];
                 arriveTime = args[6];
 
-                System.out.println("src " + src);
-                System.out.println(departDate);
-                System.out.println(departTime);
-                System.out.println(dest);
-                System.out.println(arriveDate);
-                System.out.println(arriveTime);
-
                 try {
                     flightNumber = Integer.parseInt(args[0]);
                 } catch (NumberFormatException e) {
@@ -88,7 +86,7 @@ public class TextParser implements AirlineParser {
 
                 for (char c: src.toCharArray()) {
                     if (src.length() != 3 || Character.isDigit(c)) {
-                        throw new ParserException("File Read Error: Invalid Three-letter source code");
+                        throw new ParserException("File Read Error: Invalid Three-Letter source code");
                     }
                 }
 
@@ -98,7 +96,7 @@ public class TextParser implements AirlineParser {
 
                 for (char c: dest.toCharArray()) {
                     if (dest.length() != 3 || Character.isDigit(c)) {
-                        throw new ParserException("File Read Error: Invalid Three-letter destination code");
+                        throw new ParserException("File Read Error: Invalid Three-Letter destination code");
                     }
                 }
 

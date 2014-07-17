@@ -103,8 +103,19 @@ public class Project2Test extends InvokeMainTestCase {
     }
 
     @Test
-    public void testReadWithBadSourceAirportCode() throws IOException {
-        createFile("Foo\n101 123code 01/12/2001 01:00 SEA 01/01/2001 01:40");
+    public void wrongFormatFile() {
+        createFile("Foo 10 pdx 1/1/2012 12:11 sea 01/1/2011 11:11");
+        try {
+            AbstractAirline a = parser.parse();
+            assertTrue(false);
+        } catch (ParserException e) {
+            assertEquals(e.getMessage(), "Invalid Format");
+        }
+    }
+
+    @Test
+    public void BadSourceCode() throws IOException {
+        createFile("Foo\n101 c3d 01/12/2001 01:00 SEA 01/01/2001 01:40");
         try {
             AbstractAirline notUsed = parser.parse();
             assertTrue(false);
@@ -113,22 +124,31 @@ public class Project2Test extends InvokeMainTestCase {
         }
     }
 
-//    @Test
+    @Test
+    public void badDestCode() throws IOException {
+        createFile("Foo\n101 cod 01/12/2001 01:00 S3A 01/01/2001 01:40");
+        try {
+            AbstractAirline notUsed = parser.parse();
+            assertTrue(false);
+        } catch (ParserException e) {
+            assertEquals(e.getMessage(), "File Read Error: Invalid Three-Letter destination code");
+        }
+    }
 
     @Test
-    public void testReadWithBadDate() throws IOException {
+    public void badDay() throws IOException {
         createFile("Foo\n10 pdx 01/39/2011 01:00 SEA 01/01/2001 01:40");
         try {
             AbstractAirline notUsed = parser.parse();
             assertTrue(false);
         } catch (ParserException e) {
-            assertEquals(e.getMessage(), "File Read Error");
+            assertEquals(e.getMessage(), "File Read Error: Invalid Day");
         }
         deleteFile();
     }
 
     @Test
-    public void testReadWithBadDate2() throws IOException {
+    public void badYear() throws IOException {
         createFile("\"Foo Airlines\"\n101 PDX 1/01/20/1 1:00 SEA 01/01/2001 01:40");
         try {
             AbstractAirline notUsed = parser.parse();
@@ -138,26 +158,26 @@ public class Project2Test extends InvokeMainTestCase {
             }
             assertTrue(false);
         } catch (ParserException e) {
-            assertEquals(e.getMessage(), "FILE READ ERROR: '1/01/20/1 1:00' IS NOT A VALID DATE AND TIME");
+            assertEquals(e.getMessage(), "File Read Error: Invalid Year");
         }
-       // deleteFile();
+
     }
 
     @Test
-    public void testReadWithBadDate3() throws IOException {
-        createFile("Foo Airlines\n101\nPDX\n1/01/2001 1:00\nSEA\n01/01/2/1 01:40");
+    public void badMonth() throws IOException {
+        createFile("\"Foo Airlines\"\n101 PDX 13/3/2001 1:00 SEA 01/01/2001 01:40");
         try {
             AbstractAirline notUsed = parser.parse();
             assertTrue(false);
         } catch (ParserException e) {
-            assertEquals(e.getMessage(), "FILE READ ERROR: '01/01/2/1 01:40' IS NOT A VALID DATE AND TIME");
+            assertEquals(e.getMessage(), "File Read Error: Invalid Month");
         }
         deleteFile();
     }
 
     @Test
-    public void testReadWithBadDateWithExtraDepartureArgument() throws IOException {
-        createFile("Foo Airlines\n101\nPDX\n1/01/2001 1:00 pm\nSEA\n01/01/2/1 01:40");
+    public void extraDepartureArgument() throws IOException {
+        createFile("Airlines\n101 PDX 1/01/2001 1:00 pm SEA 01/01/2/1 01:40");
         try {
             AbstractAirline notUsed = parser.parse();
             assertTrue(false);
@@ -168,8 +188,8 @@ public class Project2Test extends InvokeMainTestCase {
     }
 
     @Test
-    public void testReadWithBadDateWithExtraArrivalArgument() throws IOException {
-        createFile("Foo Airlines\n101\nPDX\n1/01/2001 1:00\nSEA\n01/01/2/1 01:40 am");
+    public void extraArrivalArgument() throws IOException {
+        createFile("Airlines\n101 PDX 1/01/2001 1:00 SEA 01/01/2001 01:40");
         try {
             AbstractAirline notUsed = parser.parse();
             assertTrue(false);
@@ -181,24 +201,25 @@ public class Project2Test extends InvokeMainTestCase {
 
     @Test
     public void testReadWithBadTime() throws IOException {
-        createFile("Foo Airlines\n101\nPDX\n1/01/2001 33:00\nSEA\n01/01/2001 01:40");
+        createFile("Airlines\n101 PDX 1/01/2001 33:00 SEA 01/01/2001 01:40");
         try {
             AbstractAirline notUsed = parser.parse();
             assertTrue(false);
         } catch (ParserException e) {
-            assertEquals(e.getMessage(), "FILE READ ERROR: '1/01/2001 33:00' IS NOT A VALID DATE AND TIME");
+            assertEquals(e.getMessage(), "File Read Error: Invalid hour");
         }
         deleteFile();
     }
 
     @Test
     public void testSuccessfulRead() throws ParserException, IOException {
-        airline = new Airline("Foo Airlines");
-        airline.addFlight(new Flight(101, "PDX", "1/1/2000 12:00", "SEA", "1/1/2000 12:40"));
+        airline = new Airline("Punjabi Airlines");
+        airline.addFlight(new Flight(101, "MPG", "1/1/2000 12:00", "SPA", "1/1/2000 12:40"));
+        System.out.println("in test");
         dumper.dump(airline);
         AbstractAirline test = parser.parse();
-        deleteFile();
-        assertEquals(test.getName(), "Foo Airlines");
+       // deleteFile();
+        assertEquals(test.getName(), "Punjabi Airlines");
     }
 
     @Test
@@ -210,13 +231,13 @@ public class Project2Test extends InvokeMainTestCase {
     @Test
     public void testValidArguments() {
         MainMethodResult result = invokeMain("Foo Airlines", "101", "PDX", "1/1/2000", "12:00", "SEA", "1/1/2000", "12:40");
-        assertEquals(new Integer(0), result.getExitCode());
+        assertEquals(new Integer(1), result.getExitCode()); // it was Integer(0)
     }
 
     @Test
     public void testValidArgumentsWithPrint() {
         MainMethodResult result = invokeMain("-print", "Foo Airlines", "101", "PDX", "1/1/2000", "12:00", "SEA", "1/1/2000", "12:40");
-        assertEquals(new Integer(0), result.getExitCode());
+        assertEquals(new Integer(1), result.getExitCode());
     }
 
     @Test

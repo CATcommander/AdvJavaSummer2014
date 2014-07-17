@@ -44,7 +44,7 @@ public class Project2 {
 
         System.out.println("\nUSAGE\n-------\nNote: Arguments must be in order. Options order does not matter and they are optional.\n\n" + USAGE);
 
-        System.exit(0);
+        System.exit(1);
     }
 
     /**

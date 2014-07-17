@@ -53,10 +53,10 @@ public class TextDumper implements AirlineDumper {
                 System.out.println(flight.toString());
                 bufferedWriter.write(flight.getNumber() + " ");
                 bufferedWriter.write(flight.getSource() + " ");
-                bufferedWriter.write(flight.getDestination() + " ");
                 bufferedWriter.write(flight.getDepartureString() + " ");
+                bufferedWriter.write(flight.getDestination() + " ");
                 bufferedWriter.write(flight.getArrivalString());
-
+                bufferedWriter.write("\n");
             }
 
             bufferedWriter.flush();
