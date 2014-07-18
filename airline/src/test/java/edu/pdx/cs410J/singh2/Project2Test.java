@@ -3,8 +3,7 @@ package edu.pdx.cs410J.singh2;
 import edu.pdx.cs410J.AbstractAirline;
 import edu.pdx.cs410J.InvokeMainTestCase;
 import edu.pdx.cs410J.ParserException;
-import jdk.nashorn.internal.ir.annotations.Ignore;
-import junit.framework.Assert;
+
 import org.junit.Test;
 
 import java.io.*;
@@ -149,7 +148,7 @@ public class Project2Test extends InvokeMainTestCase {
 
     @Test
     public void badYear() throws IOException {
-        createFile("\"Foo Airlines\"\n101 PDX 1/01/20/1 1:00 SEA 01/01/2001 01:40");
+        createFile("Airlines\n101 PDX 1/01/20/1 1:00 SEA 01/01/2001 01:40");
         try {
             AbstractAirline notUsed = parser.parse();
             Collection<Flight> flights = notUsed.getFlights();
@@ -165,7 +164,7 @@ public class Project2Test extends InvokeMainTestCase {
 
     @Test
     public void badMonth() throws IOException {
-        createFile("\"Foo Airlines\"\n101 PDX 13/3/2001 1:00 SEA 01/01/2001 01:40");
+        createFile("Airlines\n101 PDX 13/3/2001 1:00 SEA 01/01/2001 01:40");
         try {
             AbstractAirline notUsed = parser.parse();
             assertTrue(false);
@@ -215,7 +214,7 @@ public class Project2Test extends InvokeMainTestCase {
     public void testSuccessfulRead() throws ParserException, IOException {
         airline = new Airline("Punjabi Airlines");
         airline.addFlight(new Flight(101, "MPG", "1/1/2000 12:00", "SPA", "1/1/2000 12:40"));
-        System.out.println("in test");
+
         dumper.dump(airline);
         AbstractAirline test = parser.parse();
        // deleteFile();
@@ -231,13 +230,13 @@ public class Project2Test extends InvokeMainTestCase {
     @Test
     public void testValidArguments() {
         MainMethodResult result = invokeMain("Foo Airlines", "101", "PDX", "1/1/2000", "12:00", "SEA", "1/1/2000", "12:40");
-        assertEquals(new Integer(1), result.getExitCode()); // it was Integer(0)
+        assertEquals(new Integer(0), result.getExitCode());
     }
 
     @Test
     public void testValidArgumentsWithPrint() {
         MainMethodResult result = invokeMain("-print", "Foo Airlines", "101", "PDX", "1/1/2000", "12:00", "SEA", "1/1/2000", "12:40");
-        assertEquals(new Integer(1), result.getExitCode());
+        assertEquals(new Integer(0), result.getExitCode());
     }
 
     @Test

@@ -1,12 +1,11 @@
 package edu.pdx.cs410J.singh2;
 
 import edu.pdx.cs410J.AbstractAirline;
-import edu.pdx.cs410J.AbstractFlight;
 import edu.pdx.cs410J.AirlineParser;
 import edu.pdx.cs410J.ParserException;
 
 import java.io.*;
-import java.text.ParseException;
+
 
 /**
  reads the contents of a text file and from it creates an airline
@@ -14,14 +13,7 @@ import java.text.ParseException;
  */
 public class TextParser implements AirlineParser {
 
-    String fileName;
-
-    /* source: http://www.mkyong.com/regular-expressions/how-to-validate-time-in-24-hours-format-with-regular-expression/
-    http://www.mkyong.com/regular-expressions/how-to-validate-date-with-regular-expression/
-    * */
-  //  private static final String DATE_FORMAT = "(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\\\d\\\\d)";
-  //  private static final String TIME_FORMAT = "([01]?[0-9]|2[0-3]):[0-5][0-9]";
-  //  private static final String SRC_FORMAT = "[A-Z][a-z]{3}";
+    public String fileName;
 
     public TextParser(String fileName) {
         this.fileName = fileName;
@@ -32,8 +24,9 @@ public class TextParser implements AirlineParser {
         File inFile;
         FileReader fileReader;
         BufferedReader bufferedReader;
+
         Airline airline = null;
-        Flight flight = null;
+        Flight flight;
         String str;
 
 
@@ -47,15 +40,10 @@ public class TextParser implements AirlineParser {
             fileReader = new FileReader(inFile);
             bufferedReader = new BufferedReader(fileReader);
 
-
-            if (!inFile.exists())
-                throw new ParserException("File Read Error: Empty File");
-
             str = bufferedReader.readLine();
-            System.out.println(str);
 
-            if (str.contains(":") || str.contains("/") || str.matches("\\p{Punct}"))
-                throw new ParserException("Invalid Format");
+            if (str == null)
+                throw new ParserException("File Is Empty");
 
             airline = new Airline(str);
 
@@ -65,7 +53,6 @@ public class TextParser implements AirlineParser {
             String arriveDate, arriveTime;
 
             while((str = bufferedReader.readLine()) != null) {
-
                 // read flight information
                 // store into listOfFlights
                 String []args;
@@ -90,7 +77,6 @@ public class TextParser implements AirlineParser {
                     }
                 }
 
-
                 checkDate(departDate);
                 checkTime(departTime);
 
@@ -107,13 +93,17 @@ public class TextParser implements AirlineParser {
 
                 airline.addFlight(flight);
             }
+
             bufferedReader.close();
 
-        } catch (IOException ex) {
-            System.err.println("File Read Error1");
-        }// catch (ParserException ex) {
-        ////    throw new ParserException("File Read Error2");
-        //  }
+        } catch (ParserException ex) {
+            if (ex.getMessage().contains("File Is Empty"))
+                throw new ParserException("File Is Empty");
+            else if (ex.getMessage().contains("File is malformatted"))
+                throw new ParserException("File is malformatted");
+        } catch (IOException e) {
+            throw new ParserException("File Does Not Exist");
+        }
 
         return airline;
     }
