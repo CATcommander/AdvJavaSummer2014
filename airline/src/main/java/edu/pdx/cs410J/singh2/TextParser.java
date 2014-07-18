@@ -59,6 +59,8 @@ public class TextParser implements AirlineParser {
 
             if (str == null)
                 throw new ParserException("File Is Empty");
+            if (str.contains(":") || str.contains("/") || str.matches("\\p{Punct}"))
+                throw new ParserException("Invalid Format");
 
             airline = new Airline(str);
 
@@ -72,6 +74,9 @@ public class TextParser implements AirlineParser {
                 // store into listOfFlights
                 String []args;
                 args = str.split(" ");
+
+                if (args.length > 7)
+                    throw new ParserException("File Read Error: Extra Argument");
 
                 src = args[1];
                 departDate = args[2];
@@ -118,6 +123,32 @@ public class TextParser implements AirlineParser {
                 throw new ParserException("File Is Empty");
             else if (ex.getMessage().contains("File is malformatted"))
                 throw new ParserException("File is malformatted");
+            else if (ex.getMessage().contains("File Read Error: Invalid Flight Number"))
+                throw new ParserException("File Read Error: Invalid Flight Number");
+            else if (ex.getMessage().contains("File Read Error: Invalid Three-Letter source code"))
+                throw new ParserException("File Read Error: Invalid Three-Letter source code");
+            else if (ex.getMessage().contains("File Read Error: Invalid Three-Letter destination code"))
+                throw new ParserException("File Read Error: Invalid Three-Letter destination code");
+            else if (ex.getMessage().contains("Invalid Format"))
+                throw new ParserException("Invalid Format");
+            else if (ex.getMessage().contains("File Read Error: Invalid Time Format"))
+                throw new ParserException("File Read Error: Invalid Time Format");
+            else if (ex.getMessage().contains("File Read Error: Invalid Hour"))
+                throw new ParserException("File Read Error: Invalid Hour");
+            else if (ex.getMessage().contains("File Read Error: Invalid Minute"))
+                throw new ParserException("File Read Error: Invalid Minute");
+            else if (ex.getMessage().contains("File Read Error: Invalid Date"))
+                throw new ParserException("File Read Error: Invalid Date");
+            else if (ex.getMessage().contains("File Read Error: Invalid Month"))
+                throw new ParserException("File Read Error: Invalid Month");
+            else if (ex.getMessage().contains("File Read Error: Invalid Day"))
+                throw new ParserException("File Read Error: Invalid Day");
+            else if (ex.getMessage().contains("File Read Error: Invalid Year"))
+                throw new ParserException("File Read Error: Invalid Year");
+            else if (ex.getMessage().contains("File Read Error: Extra Argument"))
+                throw new ParserException("File Read Error: Extra Argument");
+            else if (ex.getMessage().contains("File Does Not Exist"))
+                throw new ParserException("File Does Not Exist");
         } catch (IOException e) {
             throw new ParserException("File Does Not Exist");
         }
@@ -151,11 +182,11 @@ public class TextParser implements AirlineParser {
             throw new ParserException("File Read Error: Invalid Time Format");
         }
         if (hour > 23 || hour < 00) {
-            throw new ParserException("File Read Error: Invalid hour");
+            throw new ParserException("File Read Error: Invalid Hour");
         }
 
         if (minute > 59 || minute < 00) {
-            throw new ParserException("File Read Error: Invalid minute");
+            throw new ParserException("File Read Error: Invalid Minute");
         }
 
         return hour + ":" + minute;
@@ -184,7 +215,7 @@ public class TextParser implements AirlineParser {
             year = Integer.parseInt(date[2]);
 
         } catch (NumberFormatException ex) {
-            throw new AssertionError("File Read Error: Invalid Date");
+            throw new ParserException("File Read Error: Invalid Date");
         }
 
         if (month < 1 || month > 12) {
