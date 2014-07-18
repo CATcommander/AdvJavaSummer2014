@@ -5,7 +5,6 @@ import edu.pdx.cs410J.AbstractFlight;
 import edu.pdx.cs410J.AirlineDumper;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -34,34 +33,29 @@ public class TextDumper implements AirlineDumper {
      */
     public void dump(AbstractAirline airline) throws IOException{
 
-        File outFile;
-       // FileWriter fileWriter;
-      //  BufferedWriter bufferedWriter;
-        //String read;
-
         try {
             Collection<AbstractFlight> flightList;
             flightList = airline.getFlights();
 
-            Writer bufferedWriter;
+            Writer writer;
 
-            bufferedWriter = new BufferedWriter(new OutputStreamWriter(
+            writer = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(fileName), "UTF-8"));
 
-            bufferedWriter.write(airline.getName());
-            bufferedWriter.write("\n");
+            writer.write(airline.getName());
+            writer.write("\n");
 
             for (AbstractFlight flight: flightList) {
-                bufferedWriter.write(flight.getNumber() + " ");
-                bufferedWriter.write(flight.getSource() + " ");
-                bufferedWriter.write(flight.getDepartureString() + " ");
-                bufferedWriter.write(flight.getDestination() + " ");
-                bufferedWriter.write(flight.getArrivalString());
-                bufferedWriter.write("\n");
+                writer.write(flight.getNumber() + " ");
+                writer.write(flight.getSource() + " ");
+                writer.write(flight.getDepartureString() + " ");
+                writer.write(flight.getDestination() + " ");
+                writer.write(flight.getArrivalString());
+                writer.write("\n");
             }
 
-            bufferedWriter.flush();
-            bufferedWriter.close();
+            writer.flush();
+            writer.close();
 
         } catch(IOException ex) {
             System.err.println("File Write Error");

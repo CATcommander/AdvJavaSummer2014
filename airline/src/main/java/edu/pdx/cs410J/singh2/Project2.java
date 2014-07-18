@@ -27,9 +27,8 @@ public class Project2 {
     public static final String INVALID_CODE = "Invalid Three-letter Code";
     public static final String INVALID_DATE = "Invalid Date Format. Must be in mm/dd/yyyy";
     public static final String INVALID_TIME = "Invalid Time Format. Must in 24-hour time";
-    public static final String INVALID_FILE = "Invalid File. Must be a txt file";
 
-    private static void handlePrintREADME() {
+    private static void handleREADME() {
         System.out.println("\nAuthor\n-------\nHarmanpreet Singh\nProject1\nCS410J\n7/9/2014\n");
         System.out.println("What is it?\n-----------");
         System.out.println("A simple basic program that keeps track of Flights. Flight can be created" +
@@ -46,116 +45,6 @@ public class Project2 {
 
         System.exit(0);
     }
-
-    /**
-     * If -print flag is detected from the command line args, then print a description
-     * of the new flight
-     *
-     * @param args
-     *        string of args with print flag
-     */
-    private static void handlePrintFlag(String... args) {
-        int flightNumber;
-
-        String src, departDate, departTime, dest, arriveDate, arriveTime;
-
-        Airline airline = new Airline(args[0]);
-
-        flightNumber = validateFlightNumber(args[1]);
-        src = validateThreeLetterCode(args[2]);
-        departDate = validateDate(args[3]);
-        departTime = validateTime(args[4]);
-        dest = validateThreeLetterCode(args[5]);
-        arriveDate = validateDate(args[6]);
-        arriveTime = validateTime(args[7]);
-
-        Flight flight = new Flight(flightNumber, src, departDate + " " + departTime, dest, arriveDate + " " + arriveTime);
-        airline.addFlight(flight);
-
-        System.out.println(flight.toString());
-    }
-
-    private static void handleTextFile(String [] args, String fileName) throws ParserException, IOException {
-
-        int flightNumber;
-        String src, dest;
-        String departDate, departTime;
-        String arriveDate, arriveTime;
-        String airlineName;
-        File file;
-
-        TextParser textParser;
-        TextDumper textDumper;
-        AbstractAirline airline = null;
-
-        int i = 0;
-
-        if (args[0].compareToIgnoreCase("-print") == 0) {
-            i = 3;
-            airlineName = args[i];
-        }
-        else if (args[2].compareToIgnoreCase("-print") == 0) {
-            i = 3;
-            airlineName = args[i];
-        }
-        else {
-            i = 2;
-            airlineName = args[i];
-        }
-
-
-        // if file does not exist, parse will throw file not found
-        // exception. Make a new file and create an empty airline
-        try {
-            textParser = new TextParser(fileName);
-            airline = textParser.parse();
-        } catch (ParserException e) {
-            if (e.getMessage().contains("File Is Empty")) {
-                throw new ParserException("File Is Empty");
-            }
-            if (e.getMessage().contains("File Not Found") || e.getMessage().contains("File Does Not Exist")) {
-                file = new File(fileName);
-
-                try {
-                    file.createNewFile();
-                }
-                /*Writer outFile;
-                try {
-                    outFile = new BufferedWriter(new OutputStreamWriter(
-                            new FileOutputStream(fileName), "UTF-8"));
-                    outFile.write(airline.getName());
-
-                    outFile.close();*/
-                catch (IOException e1){
-                    throw new ParserException("File Write Error");
-                }
-            }
-        }
-
-        if (airline == null) {
-            airline = new Airline(airlineName);
-        }
-        flightNumber = validateFlightNumber(args[i + 1]);
-        src = validateThreeLetterCode(args[i + 2]);
-        departDate = validateDate(args[i + 3]);
-        departTime = validateTime(args[i + 4]);
-        dest = validateThreeLetterCode(args[i + 5]);
-        arriveDate = validateDate(args[i + 6]);
-        arriveTime = validateTime(args[i + 7]);
-
-        Flight flight = new Flight(flightNumber, src, departDate + " " + departTime, dest, arriveDate + " " + arriveTime);
-        airline.addFlight(flight);
-
-        if (airline.getName().compareToIgnoreCase(airlineName) == 0) {
-            textDumper = new TextDumper(fileName);
-            textDumper.dump(airline);
-        }
-        else if (airline.getName().compareToIgnoreCase(airlineName) != 0) {
-            throw new ParserException("Airline does not match");
-        }
-
-    }
-
 
     /**
      * This function validates if flightNumber is valid integer. If flight number is not a valid integer,
@@ -320,10 +209,23 @@ public class Project2 {
         boolean textFileFlag = false;
         String fileName;
 
+        int flightNumber;
+
+        String src, dest;
+        String departDate, departTime;
+        String arriveDate, arriveTime;
+        String airlineName;
+        TextParser textParser;
+        TextDumper textDumper;
+        File file;
+        AbstractAirline airline = null;
+
+        int i = 0;
+
         /* if command line argument contains only README */
         for (String str : args) {
             if (str.compareToIgnoreCase("-README") == 0) {
-                handlePrintREADME();
+                handleREADME();
             }
         }
 
@@ -332,6 +234,7 @@ public class Project2 {
 
         int counter = 0;
         int fileLocation = 0;
+
         /* loop through the args to check if options exist(options can be in any order) */
         for (String s : args) {
             counter++;
@@ -339,88 +242,123 @@ public class Project2 {
                 hasREADMEFlag = true;
             } else if (s.compareToIgnoreCase("-print") == 0) {
                 hasPrintFlag = true;
-            } else if (s.compareToIgnoreCase("-README") != 0 && s.compareToIgnoreCase("-print") != 0
-                    && s.compareToIgnoreCase("-textFile") !=0) {
-                hasNoFlag = true;
             }
             else if (s.compareToIgnoreCase("-textFile") == 0) {
                 textFileFlag = true;
                 fileLocation = counter;
             }
 
+            /* if invalid flag is given, error out */
             if (s.compareToIgnoreCase("-README") != 0 && s.compareToIgnoreCase("-print") != 0 &&
                     s.compareToIgnoreCase("-textFile") !=0 && s.matches("-.*")) {
                 printUsageAndExit("Invalid Option");
             }
-
         }
 
-        fileName = args[fileLocation];
+        /* check if no flag is given */
+        if (!hasPrintFlag && !textFileFlag && !hasREADMEFlag) {
+            hasNoFlag = true;
+        }
 
         /* if README flag is detected, print A README for this project and exit */
         if (hasREADMEFlag) {
-            handlePrintREADME();
+            handleREADME();
         }
 
-        /* if print flag is detected and args length is greater than 11 that means we have unknown args */
-        if (textFileFlag && hasNoFlag && hasPrintFlag && args.length > 11) {
-            printUsageAndExit("Unknown command line argument first");
+        /* ERROR CHECKING
+         * if print flag is detected and args length is greater than 11 that means we have unknown args */
+        if (textFileFlag && hasPrintFlag && args.length > 11) {
+            printUsageAndExit("Unknown command line argument");
         }
 
-        /* if no flag and no print flag and argument length is greater than 8 with unknown arg */
-        if (hasNoFlag && !textFileFlag && !hasPrintFlag && args.length > 8) {
-            printUsageAndExit("Unknown command line argument second");
+        /* if no flag detected and argument length > 8, throw an error */
+        if (hasNoFlag && args.length > 8) {
+            printUsageAndExit("Unknown command line argument");
         }
 
-        if (hasPrintFlag && hasNoFlag && !textFileFlag && args.length > 9) {
-            printUsageAndExit("Unknown command line argument third");
+        /* if no flag and print flag are detected and arg length > 9 throw an error */
+        if (hasPrintFlag && !textFileFlag && args.length > 9) {
+            printUsageAndExit("Unknown command line argument");
         }
-
-        // check if the file ends with text
-        if (!fileName.endsWith(".txt"))
-            fileName = fileName + ".txt";
 
         /* if textFile is given then check if print flag is given as well*/
         if (textFileFlag && hasPrintFlag) {
             if (args[fileLocation].compareToIgnoreCase("-print") == 0)
                 printUsageAndExit("Invalid File or Missing File");
+        }
 
-        }
-        if (textFileFlag && hasPrintFlag){
-            handlePrintFlag(args[3], args[4], args[5], args[6], args[7], args[8], args[9], args[10]);
-            handleTextFile(args, fileName);
-        }
-        else if (textFileFlag && !hasPrintFlag){
-            handleTextFile(args, fileName);
+        if (textFileFlag) {
+            /* after validating command line arguments, extract the file name */
+            fileName = args[fileLocation];
+
+            // check if the file ends with text
+            if (!fileName.endsWith(".txt"))
+                fileName = fileName + ".txt";
+
+            if (hasPrintFlag)
+                i = 3;
+            else
+                i = 2;
+
+            // if file does not exist, parse will throw file not found
+            // exception. Make a new file and create an empty airline
+            try {
+                textParser = new TextParser(fileName);
+                airline = textParser.parse();
+            } catch (ParserException e) {
+                if (e.getMessage().contains("File Is Empty")) {
+                    throw new ParserException("File Is Empty");
+                }
+                if (e.getMessage().contains("File Not Found") || e.getMessage().contains("File Does Not Exist")) {
+                    file = new File(fileName);
+
+                    try {
+                        file.createNewFile();
+                    } catch (IOException e1){
+                        throw new ParserException("File Write Error");
+                    }
+                }
+            }
         }
 
         /* if -print flag is detected, call printFlag to print the description of the project */
         if (hasPrintFlag && !textFileFlag) {
-            handlePrintFlag(args[1], args[2], args[3], args[4], args[5], args[6], args[7], args[8]);
+            i = 1;
+        }
+        if (hasNoFlag)
+            i = 0;
+
+        airlineName = args[i];
+        // if parsed airline is empty, make a new airline
+        if (airline == null) {
+            airline = new Airline(airlineName);
         }
 
-        /* if there is no print flag is given */
-        if (hasNoFlag && !hasPrintFlag && !textFileFlag) {
-            int flightNumber;
-            String name = args[0];
-            String src, dest;
-            String departDate, departTime;
-            String arriveDate, arriveTime;
+        flightNumber = validateFlightNumber(args[i + 1]);
+        src = validateThreeLetterCode(args[i + 2]);
+        departDate = validateDate(args[i + 3]);
+        departTime = validateTime(args[i + 4]);
+        dest = validateThreeLetterCode(args[i + 5]);
+        arriveDate = validateDate(args[i + 6]);
+        arriveTime = validateTime(args[i + 7]);
 
-            Airline airline = new Airline(name);
+        Flight flight = new Flight(flightNumber, src, departDate + " " + departTime, dest, arriveDate + " " + arriveTime);
+        airline.addFlight(flight);
 
-            flightNumber = validateFlightNumber(args[1]);
-            src = validateThreeLetterCode(args[2]);
-            departDate = validateDate(args[3]);
-            departTime = validateTime(args[4]);
-            dest = validateThreeLetterCode(args[5]);
-            arriveDate = validateDate(args[6]);
-            arriveTime = validateTime(args[7]);
+        if (hasPrintFlag)
+            System.out.println(flight.toString());
+        if (textFileFlag) {
+            fileName = args[fileLocation];
+            if (!fileName.endsWith(".txt"))
+                fileName = fileName + ".txt";
 
-            Flight flight = new Flight(flightNumber, src, departDate + " " + departTime, dest, arriveDate + " " + arriveTime);
-            airline.addFlight(flight);
+            if (airline.getName().compareToIgnoreCase(airlineName) == 0) {
+                textDumper = new TextDumper(fileName);
+                textDumper.dump(airline);
+            } else if (airline.getName().compareToIgnoreCase(airlineName) != 0) {
+                throw new ParserException("Airline does not match");
+            }
         }
-
         System.exit(0);
     }
 

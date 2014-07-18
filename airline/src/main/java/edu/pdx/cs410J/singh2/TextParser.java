@@ -15,10 +15,25 @@ public class TextParser implements AirlineParser {
 
     public String fileName;
 
+    /**
+     * default constructor initializes fileName
+     * @param fileName
+     *        name of the file
+     */
     public TextParser(String fileName) {
         this.fileName = fileName;
     }
 
+    /**
+     * Parses the file given, if invalid date is read, throw
+     * an error
+     * @return
+     *        airline (including flights if any exist)
+     * @throws ParserException
+     *         throws ParserException if File Is Empty
+     *         throws ParserException if File Does Not Exist
+     *         throws ParserException if File is malformatted
+     */
     public AbstractAirline parse() throws ParserException {
 
         File inFile;
@@ -76,6 +91,7 @@ public class TextParser implements AirlineParser {
                         throw new ParserException("File Read Error: Invalid Three-Letter source code");
                     }
                 }
+                src.toUpperCase();
 
                 checkDate(departDate);
                 checkTime(departTime);
@@ -85,6 +101,7 @@ public class TextParser implements AirlineParser {
                         throw new ParserException("File Read Error: Invalid Three-Letter destination code");
                     }
                 }
+                dest.toUpperCase();
 
                 checkDate(arriveDate);
                 checkTime(arriveTime);
@@ -108,6 +125,18 @@ public class TextParser implements AirlineParser {
         return airline;
     }
 
+    /**
+     * validates the time is valid and in correct format, otherwise
+     * throw a ParserException
+     * @param args
+     *        flight time from file
+     * @return
+     *        valid time
+     * @throws ParserException
+     *         throw ParserException if Invalid Time Format
+     *         throw ParserException if Invalid hour
+     *         throw ParserException if Invalid minute
+     */
     private static String checkTime(String args) throws ParserException{
 
         int hour, minute;
@@ -132,6 +161,18 @@ public class TextParser implements AirlineParser {
         return hour + ":" + minute;
     }
 
+    /**
+     * validate if date is valid and in correct format
+     * @param args
+     *        flight date from file
+     * @return
+     *        valid date
+     * @throws ParserException
+     *         throw ParserException if Invalid Date
+     *         throw ParserException if Invalid Month
+     *         throw ParserException if Invalid Day
+     *         throw ParserException if Invalid Year
+     */
     private static String checkDate(String args) throws ParserException{
         String date[] = args.split("/");
         int month, day, year;
@@ -143,7 +184,7 @@ public class TextParser implements AirlineParser {
             year = Integer.parseInt(date[2]);
 
         } catch (NumberFormatException ex) {
-            throw new AssertionError("File Read Error: Invalid Time");
+            throw new AssertionError("File Read Error: Invalid Date");
         }
 
         if (month < 1 || month > 12) {
@@ -155,7 +196,7 @@ public class TextParser implements AirlineParser {
         }
 
         /* year is 9999 assuming humanity or earth survives that long */
-        if (year < 1800 || year > 9999) {
+        if (year < 1000 || year > 9999) {
             throw new ParserException("File Read Error: Invalid Year");
         }
 
