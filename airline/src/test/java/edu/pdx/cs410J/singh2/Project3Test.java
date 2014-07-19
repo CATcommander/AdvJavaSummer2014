@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 /**
 
  */
-public class Project2Test extends InvokeMainTestCase {
+public class Project3Test extends InvokeMainTestCase {
 
     private String fileName = "file.txt";
     private TextParser parser = new TextParser(fileName);
@@ -23,10 +23,10 @@ public class Project2Test extends InvokeMainTestCase {
     private Airline airline;
 
     /**
-     * Invokes the main method of {@link Project2} with the given arguments.
+     * Invokes the main method of {@link Project3} with the given arguments.
      */
     private MainMethodResult invokeMain(String... args) {
-        return invokeMain( Project2.class, args );
+        return invokeMain( Project3.class, args );
     }
 
     private void createFile(String str) {
