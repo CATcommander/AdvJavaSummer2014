@@ -14,7 +14,7 @@ public class AboutConditionals {
 		int x = 1;
 		if (true) 
 			x++;
-		assertEquals(x, __);
+		assertEquals(x, 2);
 	}
 	
 	@Koan
