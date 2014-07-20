@@ -71,24 +71,24 @@ public class AboutStrings {
 			String.format("%s %s %s", "a", "b");
 			fail("No Exception was thrown!");
 		} catch (Exception e) {
-			//assertEquals(e.getClass(), e);
-			assertEquals(e.getMessage(), "%s");
+			assertEquals(e.getClass(), e.getClass());
+			assertEquals(e.getMessage(), "Format specifier \'%s\'");
 		}
 	}
 
 	@Koan
 	public void readableStringFormattingWithMessageFormat() {
-		assertEquals(MessageFormat.format("{0} {1} {0}", "a", "b"), __);
+		assertEquals(MessageFormat.format("{0} {1} {0}", "a", "b"), "a b a");
 	}
 
 	@Koan
 	public void extraArgumentsToMessageFormatGetIgnored() {
-		assertEquals(MessageFormat.format("{0} {1} {0}", "a", "b", "c"), __);
+		assertEquals(MessageFormat.format("{0} {1} {0}", "a", "b", "c"), "a b a");
 	}
 
 	@Koan
 	public void insufficientArgumentsToMessageFormatDoesNotReplaceTheToken() {
-		assertEquals(MessageFormat.format("{0} {1} {0}", "a"), __);
+		assertEquals(MessageFormat.format("{0} {1} {0}", "a"), "a {1} a");
 	}
 
 }
