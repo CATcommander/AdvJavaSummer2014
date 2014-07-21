@@ -1,12 +1,13 @@
 package edu.pdx.cs410J.singh2;
 
 import edu.pdx.cs410J.AbstractFlight;
+import java.util.Date;
 
 /**
  * This class has information about a Flight which extends
  * from AbstractFlight
  */
-public class Flight extends AbstractFlight {
+public class Flight extends AbstractFlight implements Comparable<Flight> {
 
     private int flightNumber;
     private String source;
@@ -44,6 +45,10 @@ public class Flight extends AbstractFlight {
         return flightNumber;
     }
 
+    public Date getDeparture() {
+
+        return null;
+    }
     /**
      * Just returns the flight's departure time (Date and Time)
      * @return departTime
@@ -71,6 +76,9 @@ public class Flight extends AbstractFlight {
         return destination;
     }
 
+    public Date getArrival() {
+        return null;
+    }
     /**
      * Just returns the flight's arrival time (Date and Time)
      * @return arriveTime
@@ -80,4 +88,8 @@ public class Flight extends AbstractFlight {
         return arriveTime;
     }
 
+    public int compareTo(Flight flight){
+
+        return 0;
+    }
 }

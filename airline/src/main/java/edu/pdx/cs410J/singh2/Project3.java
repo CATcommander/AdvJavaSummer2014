@@ -281,6 +281,9 @@ public class Project3 {
             printUsageAndExit("Unknown command line argument");
         }
 
+        if (textFileFlag && !hasPrintFlag && (args.length > 10 || args.length < 10))
+            printUsageAndExit("Unknown command line argument");
+
         /* if textFile is given then check if print flag is given as well*/
         if (textFileFlag && hasPrintFlag) {
             if (args[fileLocation].compareToIgnoreCase("-print") == 0)

@@ -49,6 +49,7 @@ public class Airline extends AbstractAirline{
      *        new flight to add to the list
      */
     public void addFlight(AbstractFlight flightToAdd) {
+
         listOfFlights.add(flightToAdd);
     }
 
