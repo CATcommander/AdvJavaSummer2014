@@ -11,7 +11,7 @@ import java.util.Collection;
   takes the contents of an airline and writes it out to a text file
  */
 public class TextDumper implements AirlineDumper {
-    String fileName;
+    private String fileName;
 
     /**
      * name of the file is parse into constructor

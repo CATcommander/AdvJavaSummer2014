@@ -1,6 +1,7 @@
 package edu.pdx.cs410J.singh2;
 
 import edu.pdx.cs410J.AbstractAirline;
+import edu.pdx.cs410J.AirportNames;
 import edu.pdx.cs410J.ParserException;
 
 import java.io.*;
@@ -10,15 +11,17 @@ import java.io.*;
  */
 public class Project3 {
 
-    public static final String USAGE="usage: java edu.pdx.cs410J.singh2.Project1 [options] <args>" +
+    public static final String USAGE="usage: java edu.pdx.cs410J.singh2.Project3 [options] <args>" +
             "\nargs are (in this order):" +
             "\nname             The name of the airline" +
             "\nflightNumber     The flight number" +
             "\nsrc              Three-letter code of departure airport" +
-            "\ndepartTime       Departure date and time (24-hour time)" +
+            "\ndepartTime       Departure date and time (12-hour time)" +
             "\ndest             Three-letter code of arrival airport" +
-            "\narriveTime       Arrival date and time (24-hour time)" +
+            "\narriveTime       Arrival date and time (12-hour time)" +
             "\noptions are (options may appear in any order):" +
+            "\npretty file      Pretty print the airline's flights to a " +
+            "\n                 to a text file or standard out (file -)" +
             "\n-textFile file   Where to read/write the airline info" +
             "\n-print           Prints a description of the new flight" +
             "\n-README          Prints a README for this project and exits";
@@ -26,7 +29,8 @@ public class Project3 {
     public static final String INVALID_FN = "Invalid Flight Number";
     public static final String INVALID_CODE = "Invalid Three-letter Code";
     public static final String INVALID_DATE = "Invalid Date Format. Must be in mm/dd/yyyy";
-    public static final String INVALID_TIME = "Invalid Time Format. Must in 24-hour time";
+    public static final String INVALID_TIME = "Invalid Time Format. Must be in 12-hour time";
+    public static final String INVALID_DAY = "Invalid Day Format. Must be am/pm";
 
     private static void handleREADME() {
         System.out.println("\nAuthor\n-------\nHarmanpreet Singh\nProject1\nCS410J\n7/9/2014\n");
@@ -87,6 +91,13 @@ public class Project3 {
 
     private static String validateDate(String args) {
 
+        for (char c: args.toCharArray()) {
+            if (Character.isAlphabetic(c)) {
+                printUsageAndExit(INVALID_DATE);
+                throw new AssertionError("Unreachable statement");
+            }
+        }
+
         String date[] = args.split("/");
         int month, day, year;
 
@@ -134,6 +145,13 @@ public class Project3 {
      *        returns the validated time in correct format (hh:mm)
      */
     private static String validateTime(String args) {
+
+        for (char c: args.toCharArray()) {
+            if (Character.isAlphabetic(c)) {
+                throw new AssertionError(INVALID_TIME);
+            }
+        }
+
         String time[] = args.split(":");
         int hour, minute;
 
@@ -147,12 +165,13 @@ public class Project3 {
             throw new AssertionError("Unreachable statement");
         }
 
-        if (hour > 23 || hour < 00) {
+        /* check if time is in 24-hour format */
+        if (hour > 12 || hour < 1) {
             printUsageAndExit(INVALID_TIME);
             throw new AssertionError("Unreachable statement");
         }
 
-        if (minute > 59 || minute < 00) {
+        if (minute > 59 || minute < 0) {
             printUsageAndExit(INVALID_TIME);
             throw new AssertionError("Unreachable statement");
         }
@@ -160,18 +179,16 @@ public class Project3 {
         return time[0] + ":" + time[1];
     }
 
-    /**
-     * Print the error messaged parsed in and exits with system error code 1
-     * @param errorMessage
-     *        the error message to print
-     */
-    private static void printUsageAndExit(String errorMessage) {
 
-        System.err.println(errorMessage);
-        System.err.println();
-        System.err.println(USAGE);
+    private static String validateDay(String arg) {
+        for (char c: arg.toCharArray()) {
+            if (arg.length() != 2 || Character.isDigit(c)) {
+                printUsageAndExit(INVALID_DAY);
+                throw new AssertionError("Unreachable statement");
+            }
+        }
 
-        System.exit(1);
+        return arg.toUpperCase();
     }
 
     /**
@@ -191,8 +208,28 @@ public class Project3 {
             }
         }
 
-        return arg.toUpperCase();
+        String validCode = AirportNames.getName(arg.toUpperCase());
+
+        if (validCode == null)
+            printUsageAndExit(INVALID_CODE);
+
+        return validCode;
     }
+
+    /**
+     * Print the error messaged parsed in and exits with system error code 1
+     * @param errorMessage
+     *        the error message to print
+     */
+    private static void printUsageAndExit(String errorMessage) {
+
+        System.err.println(errorMessage);
+        System.err.println();
+        System.err.println(USAGE);
+
+        System.exit(1);
+    }
+
 
     /**
      * Main program that parses the command line, creates a new
@@ -207,18 +244,23 @@ public class Project3 {
         boolean hasREADMEFlag = false;
         boolean hasNoFlag = false;
         boolean textFileFlag = false;
+        boolean prettyFlag = false;
         String fileName;
 
         int flightNumber;
 
         String src, dest;
-        String departDate, departTime;
-        String arriveDate, arriveTime;
+        String departDate, departTime, departDay;
+        String arriveDate, arriveTime, arrivalDay;
         String airlineName;
         TextParser textParser;
         TextDumper textDumper;
         File file;
         AbstractAirline airline = null;
+
+        int counter = 0;
+        int fileLocation = 0;
+        int prettyFile = 0;
 
         int i = 0;
 
@@ -229,34 +271,36 @@ public class Project3 {
             }
         }
 
-        if (args.length < 8 || args.length > 12)
+        if (args.length < 10 || args.length > 14)
             printUsageAndExit("Not enough or too many command line arguments");
-
-        int counter = 0;
-        int fileLocation = 0;
 
         /* loop through the args to check if options exist(options can be in any order) */
         for (String s : args) {
             counter++;
             if (s.compareToIgnoreCase("-README") == 0) {
                 hasREADMEFlag = true;
-            } else if (s.compareToIgnoreCase("-print") == 0) {
+            }
+            else if (s.compareToIgnoreCase("-print") == 0) {
                 hasPrintFlag = true;
             }
             else if (s.compareToIgnoreCase("-textFile") == 0) {
                 textFileFlag = true;
                 fileLocation = counter;
             }
+            else if (s.compareToIgnoreCase("-pretty") == 0) {
+                prettyFlag = true;
+                prettyFile = counter;
+            }
 
             /* if invalid flag is given, error out */
             if (s.compareToIgnoreCase("-README") != 0 && s.compareToIgnoreCase("-print") != 0 &&
-                    s.compareToIgnoreCase("-textFile") !=0 && s.matches("-.*")) {
+                    s.compareToIgnoreCase("-textFile") != 0 && s.compareToIgnoreCase("-pretty") != 0 && s.matches("-.*")) {
                 printUsageAndExit("Invalid Option");
             }
         }
 
         /* check if no flag is given */
-        if (!hasPrintFlag && !textFileFlag && !hasREADMEFlag) {
+        if (!hasPrintFlag && !textFileFlag && !hasREADMEFlag && !prettyFlag) {
             hasNoFlag = true;
         }
 
@@ -265,29 +309,38 @@ public class Project3 {
             handleREADME();
         }
 
-        /* ERROR CHECKING
-         * if print flag is detected and args length is greater than 11 that means we have unknown args */
-        if (textFileFlag && hasPrintFlag && args.length > 11) {
+        // ERROR CHECKING
+        /* if pretty print flag is detected along with invalid argument, error out */
+        if (prettyFlag && !textFileFlag && !hasPrintFlag && (args.length > 12 || args.length < 12)) {
+            printUsageAndExit("Unknown command line argument");
+        }
+
+         /* if print flag is detected and args length is greater than 11 that means we have unknown args */
+        if (textFileFlag && hasPrintFlag && args.length > 13) {
             printUsageAndExit("Unknown command line argument");
         }
 
         /* if no flag detected and argument length > 8, throw an error */
-        if (hasNoFlag && args.length > 8) {
+        if (hasNoFlag && args.length > 10) {
             printUsageAndExit("Unknown command line argument");
         }
 
-        /* if no flag and print flag are detected and arg length > 9 throw an error */
-        if (hasPrintFlag && !textFileFlag && args.length > 9) {
+        /* if no flag and print flag are detected and arg length > 11 throw an error */
+        if (hasPrintFlag && !textFileFlag && args.length > 11) {
             printUsageAndExit("Unknown command line argument");
         }
 
-        if (textFileFlag && !hasPrintFlag && (args.length > 10 || args.length < 10))
+        if (textFileFlag && !hasPrintFlag && (args.length > 12 || args.length < 12))
             printUsageAndExit("Unknown command line argument");
 
         /* if textFile is given then check if print flag is given as well*/
         if (textFileFlag && hasPrintFlag) {
             if (args[fileLocation].compareToIgnoreCase("-print") == 0)
                 printUsageAndExit("Invalid File or Missing File");
+        }
+
+        if (prettyFlag && !textFileFlag && !hasPrintFlag && args.length <= 12) {
+            System.out.println("pretty flag detected");
         }
 
         if (textFileFlag) {
@@ -330,6 +383,8 @@ public class Project3 {
         }
         if (hasNoFlag)
             i = 0;
+        if (prettyFlag)
+            i = 2;
 
         airlineName = args[i];
         // if parsed airline is empty, make a new airline
@@ -341,11 +396,13 @@ public class Project3 {
         src = validateThreeLetterCode(args[i + 2]);
         departDate = validateDate(args[i + 3]);
         departTime = validateTime(args[i + 4]);
-        dest = validateThreeLetterCode(args[i + 5]);
-        arriveDate = validateDate(args[i + 6]);
-        arriveTime = validateTime(args[i + 7]);
+        departDay = validateDay(args[i + 5]);
+        dest = validateThreeLetterCode(args[i + 6]);
+        arriveDate = validateDate(args[i + 7]);
+        arriveTime = validateTime(args[i + 8]);
+        arrivalDay = validateDay(args[i + 9]);
 
-        Flight flight = new Flight(flightNumber, src, departDate + " " + departTime, dest, arriveDate + " " + arriveTime);
+        Flight flight = new Flight(flightNumber, src, departDate + " " + departTime, departDay, dest, arriveDate + " " + arriveTime, arrivalDay);
         airline.addFlight(flight);
 
         if (hasPrintFlag)

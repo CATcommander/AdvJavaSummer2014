@@ -92,7 +92,7 @@ public class Project3Test extends InvokeMainTestCase {
 */
     @Test
     public void testFlightNumber() throws IOException {
-        createFile("Foo\n12d pdx 1/1/2012 12:11 sea 01/1/2011 11:11");
+        createFile("Foo\n12d pdx 1/1/2012 12:11 am sea 01/1/2011 11:11 am");
         try {
             AbstractAirline use = parser.parse();
             assertTrue(false);
@@ -103,7 +103,7 @@ public class Project3Test extends InvokeMainTestCase {
 
     @Test
     public void wrongFormatFile() {
-        createFile("Foo 10 pdx 1/1/2012 12:11 sea 01/1/2011 11:11");
+        createFile("Foo 10 pdx 1/1/2012 12:11 am sea 01/1/2011 11:11 am");
         try {
             AbstractAirline a = parser.parse();
             assertTrue(false);
@@ -114,7 +114,7 @@ public class Project3Test extends InvokeMainTestCase {
 
     @Test
     public void BadSourceCode() throws IOException {
-        createFile("Foo\n101 c3d 01/12/2001 01:00 SEA 01/01/2001 01:40");
+        createFile("Foo\n101 c3d 01/12/2001 01:00 am SEA 01/01/2001 01:40 am");
         try {
             AbstractAirline notUsed = parser.parse();
             assertTrue(false);
@@ -125,7 +125,7 @@ public class Project3Test extends InvokeMainTestCase {
 
     @Test
     public void badDestCode() throws IOException {
-        createFile("Foo\n101 cod 01/12/2001 01:00 S3A 01/01/2001 01:40");
+        createFile("Foo\n101 cod 01/12/2001 01:00 am S3A 01/01/2001 01:40 am");
         try {
             AbstractAirline notUsed = parser.parse();
             assertTrue(false);
@@ -136,7 +136,7 @@ public class Project3Test extends InvokeMainTestCase {
 
     @Test
     public void badDay() throws IOException {
-        createFile("Foo\n10 pdx 01/39/2011 01:00 SEA 01/01/2001 01:40");
+        createFile("Foo\n10 pdx 01/39/2011 01:00 am SEA 01/01/2001 01:40 am");
         try {
             AbstractAirline notUsed = parser.parse();
             assertTrue(false);
@@ -148,7 +148,7 @@ public class Project3Test extends InvokeMainTestCase {
 
     @Test
     public void badYear() throws IOException {
-        createFile("Airlines\n101 PDX 1/01/20/1 1:00 SEA 01/01/2001 01:40");
+        createFile("Airlines\n101 PDX 1/01/20/1 1:00 am SEA 01/01/2001 01:40 am");
         try {
             AbstractAirline notUsed = parser.parse();
             Collection<Flight> flights = notUsed.getFlights();
@@ -164,7 +164,7 @@ public class Project3Test extends InvokeMainTestCase {
 
     @Test
     public void badMonth() throws IOException {
-        createFile("Airlines\n101 PDX 13/3/2001 1:00 SEA 01/01/2001 01:40");
+        createFile("Airlines\n101 PDX 13/3/2001 1:00 am SEA 01/01/2001 01:40 am");
         try {
             AbstractAirline notUsed = parser.parse();
             assertTrue(false);
@@ -213,7 +213,7 @@ public class Project3Test extends InvokeMainTestCase {
     @Test
     public void testSuccessfulRead() throws ParserException, IOException {
         airline = new Airline("Punjabi Airlines");
-        airline.addFlight(new Flight(101, "MPG", "1/1/2000 12:00", "SPA", "1/1/2000 12:40"));
+        airline.addFlight(new Flight(101, "MPG", "1/1/2000 12:00", "am", "SPA", "1/1/2000 12:40", "pm"));
 
         dumper.dump(airline);
         AbstractAirline test = parser.parse();
