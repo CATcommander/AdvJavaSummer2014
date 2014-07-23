@@ -11,8 +11,8 @@ import java.util.ArrayList;
  */
 public class Airline extends AbstractAirline{
 
-    private static ArrayList<AbstractFlight> listOfFlights;
-    private static String AirlineName;
+    private ArrayList<AbstractFlight> listOfFlights;
+    private String AirlineName;
 
     /** creates new <code> Airline </code>
      *

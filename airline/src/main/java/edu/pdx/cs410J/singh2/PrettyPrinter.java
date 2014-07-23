@@ -35,6 +35,8 @@ public class PrettyPrinter implements AirlineDumper {
             writer.write("Airline: " + airline.getName());
             writer.write("\n");
 
+
+            // convert time duration into minutes
             for (AbstractFlight flight: flightList) {
                 writer.write("Flight Number: " + flight.getNumber() + "\n");
                 writer.write("From: " + flight.getSource());

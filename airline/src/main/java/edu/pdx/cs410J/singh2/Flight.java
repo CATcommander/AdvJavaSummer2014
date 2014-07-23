@@ -55,35 +55,37 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
         return flightNumber;
     }
 
+    /**
+     * Returns the Date object with validated and formatted date
+     *
+     * @return formatted Date object
+     */
     @Override
     public Date getDeparture() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy mm:hh a", Locale.US);
-        DateFormat dateFormat = null;
-        String dateInString;
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.US);
+
         Date date = null;
 
         try {
             date = simpleDateFormat.parse(departTime);
-            dateInString = dateFormat.format(date);
+
         } catch (ParseException e) {
             e.printStackTrace();
-        }
-
-        if (dateFormat != null) {
-            dateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
         }
 
         return date;
     }
 
     /**
-     * Just returns the flight's departure time (Date and Time)
+     * Returns Departure string that is formatted using DateFormat.SHORT
      *
      * @return departTime
-     * flight's departure time
+     *         returns validated DateFormat Arrival string
      */
     public String getDepartureString() {
-        return departTime + " " + departDay;
+        System.out.println("depart time " + departTime);
+
+        return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(this.getDeparture());
     }
 
     /**
@@ -106,29 +108,37 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
         return destination;
     }
 
+    /**
+     * Returns the Date object with validated and formatted date
+     *
+     * @return formatted Date object
+     */
     @Override
     public Date getArrival() {
-        return null;
-    }
 
-    /**
-     * Just returns the flight's arrival time (Date and Time)
-     *
-     * @return arriveTime
-     * returns flight's arrival time
-     */
-    public String getArrivalString() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("a");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.US);
         Date date = null;
+
         try {
-            date = simpleDateFormat.parse(arrivalDay);
+            date = simpleDateFormat.parse(arriveTime);
         } catch (ParseException e) {
             e.printStackTrace();
         }
+
+        return date;
+    }
+
+    /**
+     * Returns Arrival string that is formatted using DateFormat.SHORT
+     *
+     * @return arriveTime
+     *         returns validated DateFormat Arrival string
+     */
+    public String getArrivalString() {
+
         System.out.println(arrivalDay + "arrival time " + arriveTime);
-        String str = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(date);
-        System.out.println(str);
-        return str;
+
+        return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(this.getArrival());
     }
 
     public int compareTo(Flight flight) {

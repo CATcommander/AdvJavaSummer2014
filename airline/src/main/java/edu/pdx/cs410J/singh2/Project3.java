@@ -26,11 +26,11 @@ public class Project3 {
             "\n-print           Prints a description of the new flight" +
             "\n-README          Prints a README for this project and exits";
 
-    public static final String INVALID_FN = "Invalid Flight Number";
-    public static final String INVALID_CODE = "Invalid Three-letter Code";
-    public static final String INVALID_DATE = "Invalid Date Format. Must be in mm/dd/yyyy";
-    public static final String INVALID_TIME = "Invalid Time Format. Must be in 12-hour time";
-    public static final String INVALID_DAY = "Invalid Day Format. Must be am/pm";
+    public static final String INVALID_FN = "ERROR: Invalid Flight Number";
+    public static final String INVALID_CODE = "ERROR: Invalid Three-letter Code";
+    public static final String INVALID_DATE = "ERROR: Invalid Date Format. Must be in mm/dd/yyyy";
+    public static final String INVALID_TIME = "ERROR: Invalid Time Format. Must be in 12-hour time";
+    public static final String INVALID_DAY = "ERROR: Invalid Day Format. Must be am/pm";
 
     private static void handleREADME() {
         System.out.println("\nAuthor\n-------\nHarmanpreet Singh\nProject1\nCS410J\n7/9/2014\n");
@@ -211,7 +211,7 @@ public class Project3 {
         String validCode = AirportNames.getName(arg.toUpperCase());
 
         if (validCode == null)
-            printUsageAndExit(INVALID_CODE);
+            printUsageAndExit("ERROR: Airport code \'" +  arg + "\' does not exist");
 
         return validCode;
     }
@@ -230,6 +230,42 @@ public class Project3 {
         System.exit(1);
     }
 
+    private static void checkErrosInCommandLine(boolean hasNoFlag, boolean hasPrintFlag, boolean prettyFlag, boolean textFileFlag, String... args) {
+
+        /* if no flag detected and argument length > 10, throw an error */
+        if (hasNoFlag && args.length > 10) {
+            printUsageAndExit("Unknown command line argument");
+        }
+
+        /* only print flag is given */
+        if (hasPrintFlag && !textFileFlag && !prettyFlag && (args.length > 11 || args.length < 11)) {
+            printUsageAndExit("Unknown command line argument");
+        }
+
+        /* only textFile is given */
+        if (textFileFlag && !hasPrintFlag && !prettyFlag && (args.length > 12 || args.length < 12))
+            printUsageAndExit("Unknown command line argument");
+
+        /* only pretty flag is given */
+        if (prettyFlag && !textFileFlag && !hasPrintFlag && (args.length > 12 || args.length < 12)) {
+            printUsageAndExit("Unknown command line argument");
+        }
+
+        /* only textFile and print flags are given */
+        if (textFileFlag && hasPrintFlag && !prettyFlag && (args.length > 13 || args.length < 13)) {
+            printUsageAndExit("Unknown command line argument");
+        }
+
+        /* only print and pretty flags are given */
+        if (prettyFlag && hasPrintFlag && !textFileFlag && (args.length > 13 || args.length < 13)) {
+            printUsageAndExit("Unknown command line argument");
+        }
+
+        /* only textFile and pretty flags are given */
+        if (textFileFlag && prettyFlag && !hasPrintFlag && (args.length > 14 || args.length < 14)) {
+            printUsageAndExit("Unknown command line argument");
+        }
+    }
 
     /**
      * Main program that parses the command line, creates a new
@@ -240,12 +276,14 @@ public class Project3 {
      *        command line arguments
      */
     public static void main(String[] args) throws IOException, ParserException {
-        boolean hasPrintFlag = false;
         boolean hasREADMEFlag = false;
+        boolean hasPrintFlag = false;
         boolean hasNoFlag = false;
         boolean textFileFlag = false;
         boolean prettyFlag = false;
         String fileName;
+
+        boolean flags[] = {hasNoFlag, hasPrintFlag, textFileFlag, prettyFlag};
 
         int flightNumber;
 
@@ -294,53 +332,34 @@ public class Project3 {
 
             /* if invalid flag is given, error out */
             if (s.compareToIgnoreCase("-README") != 0 && s.compareToIgnoreCase("-print") != 0 &&
-                    s.compareToIgnoreCase("-textFile") != 0 && s.compareToIgnoreCase("-pretty") != 0 && s.matches("-.*")) {
+                    s.compareToIgnoreCase("-textFile") != 0 && s.compareToIgnoreCase("-pretty") != 0 &&
+                    s.compareToIgnoreCase("-") != 0 && s.matches("-.*")) {
+
                 printUsageAndExit("Invalid Option");
             }
         }
 
-        /* check if no flag is given */
+        /* check if no flag is given*/
         if (!hasPrintFlag && !textFileFlag && !hasREADMEFlag && !prettyFlag) {
             hasNoFlag = true;
         }
 
-        /* if README flag is detected, print A README for this project and exit */
+        /* First of All, if README flag is detected, print A README for this project and exit */
         if (hasREADMEFlag) {
             handleREADME();
         }
 
         // ERROR CHECKING
-        /* if pretty print flag is detected along with invalid argument, error out */
-        if (prettyFlag && !textFileFlag && !hasPrintFlag && (args.length > 12 || args.length < 12)) {
-            printUsageAndExit("Unknown command line argument");
-        }
+        checkErrosInCommandLine(hasNoFlag, hasPrintFlag, prettyFlag, textFileFlag, args);
 
-         /* if print flag is detected and args length is greater than 11 that means we have unknown args */
-        if (textFileFlag && hasPrintFlag && args.length > 13) {
-            printUsageAndExit("Unknown command line argument");
+        if (prettyFlag && !textFileFlag && !hasPrintFlag && args.length <= 12) {
+            System.out.println("pretty flag detected");
         }
-
-        /* if no flag detected and argument length > 8, throw an error */
-        if (hasNoFlag && args.length > 10) {
-            printUsageAndExit("Unknown command line argument");
-        }
-
-        /* if no flag and print flag are detected and arg length > 11 throw an error */
-        if (hasPrintFlag && !textFileFlag && args.length > 11) {
-            printUsageAndExit("Unknown command line argument");
-        }
-
-        if (textFileFlag && !hasPrintFlag && (args.length > 12 || args.length < 12))
-            printUsageAndExit("Unknown command line argument");
 
         /* if textFile is given then check if print flag is given as well*/
         if (textFileFlag && hasPrintFlag) {
             if (args[fileLocation].compareToIgnoreCase("-print") == 0)
                 printUsageAndExit("Invalid File or Missing File");
-        }
-
-        if (prettyFlag && !textFileFlag && !hasPrintFlag && args.length <= 12) {
-            System.out.println("pretty flag detected");
         }
 
         if (textFileFlag) {
@@ -402,7 +421,11 @@ public class Project3 {
         arriveTime = validateTime(args[i + 8]);
         arrivalDay = validateDay(args[i + 9]);
 
-        Flight flight = new Flight(flightNumber, src, departDate + " " + departTime, departDay, dest, arriveDate + " " + arriveTime, arrivalDay);
+        String arrival = arriveDate + " " + arriveTime + " " + arrivalDay;
+        String departure = departDate + " " + departTime + " " + departDay;
+
+        Flight flight = new Flight(flightNumber, src, departure, departDay, dest, arrival, arrivalDay);
+
         airline.addFlight(flight);
 
         if (hasPrintFlag)
