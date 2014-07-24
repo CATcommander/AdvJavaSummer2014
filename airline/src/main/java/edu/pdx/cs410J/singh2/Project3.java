@@ -1,12 +1,14 @@
 package edu.pdx.cs410J.singh2;
 
 import edu.pdx.cs410J.AbstractAirline;
+import edu.pdx.cs410J.AbstractFlight;
 import edu.pdx.cs410J.AirportNames;
 import edu.pdx.cs410J.ParserException;
 
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
 
@@ -52,6 +54,36 @@ public class Project3 {
         System.out.println("\nUSAGE\n-------\nNote: Arguments must be in order. Options order does not matter and they are optional.\n\n" + USAGE);
 
         System.exit(0);
+    }
+
+    /**
+     *  Validates the Date, time and am/pm marker
+     * @param args
+     *        date and time string
+     * @return
+     *        validated date and time
+     * @throws ParserException
+     *         Throws ParserException on Invalid Date or Time
+     */
+    private static String validateDateAndTime(String args) throws ParserException {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+
+        try {
+            sdf.parse(args);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // 11/12/2014 12:00 pm
+        String dateAndTime[] = args.split(" ");
+        String date, time, marker;
+
+        date = validateDate(dateAndTime[0]);
+        time = validateTime(dateAndTime[1]);
+        marker = validateDay(dateAndTime[2]);
+
+        return date + " " + time + " " + marker;
     }
 
     /**
@@ -104,10 +136,10 @@ public class Project3 {
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
         simpleDateFormat.setLenient(false);
-        Date date1 = null;
+
 
         try {
-            date1 = simpleDateFormat.parse(args);
+            simpleDateFormat.parse(args);
 
         } catch (ParseException e) {
             e.printStackTrace();
@@ -296,20 +328,19 @@ public class Project3 {
         boolean hasNoFlag = false;
         boolean textFileFlag = false;
         boolean prettyFlag = false;
-        String fileName;
 
-        boolean flags[] = {hasNoFlag, hasPrintFlag, textFileFlag, prettyFlag};
+        String fileName;
 
         int flightNumber;
 
         String src, dest;
-        String departDate, departTime, departDay;
-        String arriveDate, arriveTime, arrivalDay;
+        String departure, arrival;
         String airlineName;
         TextParser textParser;
         TextDumper textDumper;
         File file;
         AbstractAirline airline = null;
+        PrettyPrinter prettyPrinter;
 
         int counter = 0;
         int fileLocation = 0;
@@ -349,7 +380,6 @@ public class Project3 {
             if (s.compareToIgnoreCase("-README") != 0 && s.compareToIgnoreCase("-print") != 0 &&
                     s.compareToIgnoreCase("-textFile") != 0 && s.compareToIgnoreCase("-pretty") != 0 &&
                     s.compareToIgnoreCase("-") != 0 && s.matches("-.*")) {
-
                 printUsageAndExit("Invalid Option");
             }
         }
@@ -370,10 +400,6 @@ public class Project3 {
         if (textFileFlag && prettyFlag) {
             if (args[fileLocation].compareToIgnoreCase(args[prettyFile]) == 0)
                 printUsageAndExit("ERROR: textFile and pretty cannot use the SAME file. \nPlease use a different file for pretty print");
-        }
-
-        if (prettyFlag && !textFileFlag && !hasPrintFlag && args.length <= 12) {
-            System.out.println("pretty flag detected");
         }
 
         /* if textFile is given then check if print flag is given as well*/
@@ -417,7 +443,7 @@ public class Project3 {
         }
 
         /* if -print flag is detected, call printFlag to print the description of the project */
-        if (hasPrintFlag && !textFileFlag) {
+        if (hasPrintFlag && !textFileFlag && !prettyFlag) {
             i = 1;
         }
 
@@ -439,26 +465,19 @@ public class Project3 {
         }
 
         flightNumber = validateFlightNumber(args[i + 1]);
+
         src = validateThreeLetterCode(args[i + 2]);
-        departDate = validateDate(args[i + 3]);
-        departTime = validateTime(args[i + 4]);
-        departDay = validateDay(args[i + 5]);
+        departure = validateDateAndTime(args[i + 3] + " " + args[i + 4] + " " + args[i + 5]);
+
         dest = validateThreeLetterCode(args[i + 6]);
-        arriveDate = validateDate(args[i + 7]);
-        arriveTime = validateTime(args[i + 8]);
-        arrivalDay = validateDay(args[i + 9]);
+        arrival = validateDateAndTime(args[i + 7] + " " + args[i + 8] + " " + args[i + 9]);
 
-        String arrival = arriveDate + " " + arriveTime + " " + arrivalDay;
-        String departure = departDate + " " + departTime + " " + departDay;
-
-        Flight flight = new Flight(flightNumber, src, departure, departDay, dest, arrival, arrivalDay);
+        Flight flight = new Flight(flightNumber, src, departure, dest, arrival);
 
         airline.addFlight(flight);
 
         if (hasPrintFlag)
             System.out.println(flight.toString());
-
-        PrettyPrinter prettyPrinter;
 
         if (textFileFlag) {
             fileName = args[fileLocation];
@@ -473,7 +492,28 @@ public class Project3 {
             }
         }
 
-        if (prettyFlag || textFileFlag) {
+        if (prettyFlag && args[prettyFile].contains("-")) {
+            // print out the headers
+            System.out.println("Flight #\tSource\t\t\tDeparture Date & Time\t\t\tDestination\t\t\tArrival Date & Time\t\t\tDuration");
+            System.out.println("--------\t------\t\t\t---------------------\t\t\t-----------\t\t\t-------------------\t\t\t--------\n");
+
+            Collection<Flight> flightList;
+            flightList = airline.getFlights();
+
+            // convert time duration into minutes
+            for (AbstractFlight abstractFlight: flightList) {
+                System.out.print(abstractFlight.getNumber() + "\t\t\t");
+                System.out.print(((Flight) abstractFlight).getSrcCode() + "\t");
+                System.out.print(abstractFlight.getDeparture() + "\t");
+                System.out.print(((Flight) abstractFlight).getDestCode() + "\t");
+                System.out.print("\t" + abstractFlight.getArrival() + "\t" + ((Flight) abstractFlight).getDuration() + "\n");
+            }
+
+            System.out.println(String.format("%-7s= %sflgiht" , "Flight", "blah" ));
+
+        }
+
+        if (prettyFlag && !textFileFlag && !hasPrintFlag && !args[prettyFile].contains("-")) {
             fileName = args[prettyFile];
             if (!fileName.endsWith(".txt"))
                 fileName = fileName + ".txt";
@@ -489,7 +529,6 @@ public class Project3 {
             prettyPrinter = new PrettyPrinter(fileName);
             prettyPrinter.dump(airline);
         }
-
 
         System.exit(0);
     }

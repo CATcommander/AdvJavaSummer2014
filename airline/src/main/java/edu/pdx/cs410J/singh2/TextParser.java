@@ -71,26 +71,23 @@ public class TextParser implements AirlineParser {
 
             int flightNumber;
             String src, dest;
-            String departDate, departTime, departDay;
-            String arriveDate, arriveTime, arrivalDay;
+            String departDateAndTime;
+            String arriveDateAndTime;
 
+            // keep reading the file until its not null
             while((str = bufferedReader.readLine()) != null) {
-                // read flight information
-                // store into listOfFlights
+
                 String []args;
                 args = str.split(" ");
 
                 if (args.length > 9 || args.length < 9)
                     throw new ParserException("File Read Error: Invalid command line Argument");
 
-                src = args[1];
-                departDate = args[2];
-                departTime = args[3];
-                departDay = args[4];
-                dest = args[5];
-                arriveDate = args[6];
-                arriveTime = args[7];
-                arrivalDay = args[8];
+                src = args[1]; // source code
+                departDateAndTime = args[2] + " " + args[3] + " " + args[4]; // departTime
+
+                dest = args[5]; // destination code
+                arriveDateAndTime = args[6] + " " + args[7] + " " + args[8]; // arrivalTime
 
                 try {
                     flightNumber = Integer.parseInt(args[0]);
@@ -98,28 +95,14 @@ public class TextParser implements AirlineParser {
                     throw new ParserException("File Read Error: Invalid Flight Number");
                 }
 
-                // make a simpledateformat to check the format here, if valid pass to functions
-             /*   SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/YYYY hh:mm a");
-                try {
-                    Date date = simpleDateFormat.parse(args[2] + " " + args[3] + " " + args[4]);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-*/
                 checkCode(src);
-                checkDate(departDate);
-                checkTime(departTime);
-                checkDay(departDay);
 
+                checkDateAndTime(departDateAndTime);
                 checkCode(dest);
-                checkDate(arriveDate);
-                checkTime(arriveTime);
-                checkDay(arrivalDay);
 
-                String depart = departDate + " " + departTime + " " + departDay;
-                String arrive = arriveDate + " " + arriveTime + " " + arrivalDay;
+                checkDateAndTime(arriveDateAndTime);
 
-                flight = new Flight(flightNumber, src, depart, departDay, dest, arrive, arrivalDay);
+                flight = new Flight(flightNumber, src, departDateAndTime, dest, arriveDateAndTime);
 
                 airline.addFlight(flight);
             }
@@ -166,6 +149,48 @@ public class TextParser implements AirlineParser {
         }
 
         return airline;
+    }
+
+    /**
+     *  Validates the Date, time and am/pm marker
+     * @param args
+     *        date and time string
+     * @return
+     *        validated date and time
+     * @throws ParserException
+     *         Throws ParserException on Invalid Date or Time
+     */
+    private static String checkDateAndTime(String args) throws ParserException {
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+        try {
+            simpleDateFormat.parse(args);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        // 11/12/2014 12:00 pm
+        String dateAndTime[] = args.split(" ");
+        String date, time, marker;
+
+        try {
+            date = checkDate(dateAndTime[0]);
+        } catch (ParserException e) {
+            throw new ParserException("File Read Error: Invalid Date");
+        }
+
+        try {
+            time = checkTime(dateAndTime[1]);
+        } catch (ParserException e) {
+            throw new ParserException("File Read Error: Invalid Time");
+        }
+
+        try {
+            marker = checkDay(dateAndTime[2]);
+        } catch (ParserException e) {
+            throw new ParserException("File Read Error: Invalid am/pm");
+        }
+        return date + " " + time + " " + marker;
     }
 
     /**
@@ -260,6 +285,14 @@ public class TextParser implements AirlineParser {
         return date[0] + "/" + date[1] + "/" + date[2];
     }
 
+    /**
+     * validates the am/pm marker
+     * @param args
+     *        the am/pm marker
+     * @return
+     *        validated am/pm marker
+     * @throws ParserException
+     */
     private static String checkDay(String args) throws ParserException {
         for (char c: args.toCharArray()) {
             if (args.length() != 2 || Character.isDigit(c)) {
@@ -269,6 +302,14 @@ public class TextParser implements AirlineParser {
         return args.toUpperCase();
     }
 
+    /**
+     * validates the three letter code
+     * @param arg
+     *        the three letter code
+     * @return
+     *        validated code
+     * @throws ParserException
+     */
     private static String checkCode(String arg) throws ParserException {
         for (char c: arg.toCharArray()) {
             if (arg.length() != 3 || Character.isDigit(c)) {

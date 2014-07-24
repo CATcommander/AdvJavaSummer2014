@@ -7,8 +7,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
-import java.util.TreeSet;
 
 /**
  * This class has information about a Flight which extends
@@ -23,12 +21,12 @@ import java.util.TreeSet;
 public class Flight extends AbstractFlight implements Comparable<Flight> {
 
     private int flightNumber;
+
     private String source;
     private String departTime;
-    private String departDay;
     private String destination;
     private String arriveTime;
-    private String arrivalDay;
+
 
     /**
      * @param flightNumber number of the flight
@@ -37,14 +35,14 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * @param destination  three-letter code of arrival airport
      * @param arriveTime   arrival date and time in DateFormat.SHORT (24-time is no longer supported)
      */
-    public Flight(int flightNumber, String source, String departTime, String departDay, String destination, String arriveTime, String arrivalDay) {
+    public Flight(int flightNumber, String source, String departTime, String destination, String arriveTime) {
         this.flightNumber = flightNumber;
+
         this.source = source;
         this.departTime = departTime;
-        this.departDay = departDay;
         this.destination = destination;
         this.arriveTime = arriveTime;
-        this.arrivalDay = arrivalDay;
+
     }
 
     /**
@@ -64,14 +62,13 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      */
     @Override
     public Date getDeparture() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/YYYY hh:mm a", Locale.US);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
         simpleDateFormat.setLenient(false);
 
         Date date = null;
 
         try {
             date = simpleDateFormat.parse(departTime);
-
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -86,7 +83,7 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      *         returns validated DateFormat Arrival string
      */
     public String getDepartureString() {
-        return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(this.getDeparture());
+        return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(this.getDeparture());
     }
 
     /**
@@ -96,18 +93,29 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * returns the name of departure airport
      */
     public String getSource() {
-        String airportName = null;
+        return source.toUpperCase();
+    }
 
+    /**
+     * returns the year in four digits
+     * @return returns the year in four digits
+     */
+    public String getDepartYearFourDigits() {
+        return departTime;
+    }
+
+    /**
+     * returns full three letter code
+     * Example: POR -> Portland, OR
+     * @return returns three letter code
+     */
+    public String getSrcCode() {
+        String airportName;
         airportName = AirportNames.getName(this.source.toUpperCase());
         if (airportName != null)
             return airportName;
-        System.out.println(airportName);
-        return source;
-    }
 
-    public String getSourceThreeLetterCode() {
-        System.out.println(source);
-        return source;
+        return airportName;
     }
 
 
@@ -118,19 +126,19 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * returns the name of destination airport
      */
     public String getDestination() {
-        String airportName;
+        return destination.toUpperCase();
+    }
 
+    /**
+     * returns three letter code
+     * @return returns three letter code
+     */
+    public String getDestCode() {
+        String airportName;
         airportName = AirportNames.getName(this.destination.toUpperCase());
         if (airportName != null)
             return airportName;
-        System.out.println(airportName);
-        return destination;
-    }
-
-
-    public String getDestThreeLetterCode() {
-        System.out.println(destination);
-        return destination;
+        return airportName;
     }
     /**
      * Returns the Date object with validated and formatted date
@@ -140,7 +148,7 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
     @Override
     public Date getArrival() {
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/YYYY hh:mm a", Locale.US);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
         simpleDateFormat.setLenient(false);
 
         Date date = null;
@@ -154,18 +162,10 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
         return date;
     }
 
-    public long getDuration() {
-        long minutes;
-
-        minutes = (this.getArrival().getTime() - this.getDeparture().getTime())/60000;
-        System.out.println("duration: " + minutes);
-        return minutes;
-    }
-
-    public String getDepartYearFourDigits() {
-        return departTime;
-    }
-
+    /**
+     * returns the year in four digits
+     * @return returns the year in four digits
+     */
     public String getArrivalYearFourDigits() {
         return arriveTime;
     }
@@ -179,49 +179,51 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
         return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(this.getArrival());
     }
 
+    /**
+     * get duration in minutes
+     * @return returns flight duration in minutes
+     */
+    public long getDuration() {
+        long minutes;
+        minutes = (this.getArrival().getTime() - this.getDeparture().getTime())/60000;
+
+        return minutes;
+    }
+
+    /**
+     * compares a flight object with itself to check it its the same
+     * @param flight
+     *        flight object
+     * @return
+     *        return 0 THIS object equal
+     *        return -1 THIS object is less than the flight
+     *        return 1 THIS object is greater than the flight
+     */
     public int compareTo(Flight flight) {
 
-        // return 0 THIS object equal
+        // return 0 THIS object is equal to flight
         // return -1 THIS object is less than the flight
         // return 1 THIS object is greater than the flight
+        int SMALLER = -1;
+        int SAME = 0;
+        int GREATER = 1;
 
-        //if (this.getSource().compareTo(flight.getSource()) != 0)
-          //  return (this.getSource().compareTo(flight.getSource()));
-
-        //return (this.getSource().compareTo(flight.getSource()) == 0) ? (this.getDepartureString().compareTo(flight.getDepartureString())) : 0;
-        if(this.getSource().compareTo((flight).getSource()) != 0) {
-            return (this.getSource().compareTo(flight.getSource()));
+        if (this.source.compareTo(flight.getSource()) == 1) {
+            return GREATER;
         }
-        else
-            return this.getDepartureString().compareTo(flight.getDepartureString());
-    }
-
-
-}
-
-/*
-
-public int compareTo(Flight o) {
-        if(this.getSource().compareTo((o).getSource()) != 0) {
-            return (this.getSource().compareTo(o.getSource()));
+        else if (this.source.compareTo(flight.getSource()) == -1) {
+            return SMALLER;
         }
-        else
-            return this.getDepartureString().compareTo(o.getDepartureString());
-    }
-
-
-int result = this.source1.compareTo(o.getSource());
-
-        if (result == 0) {
-            int result1 = this.departureDateTime.compareTo(o.getDeparture());
-            if (result1 == 0) {
-                return 0;
-            } else {
-                return result1;
+        else {
+            if (this.getDeparture().before(flight.getDeparture())){
+                return SMALLER;
             }
-
-        } else {
-            return result;
+            else if (this.getDeparture().after(flight.getDeparture())) {
+                return GREATER;
+            }
+            else {
+                return SAME;
+            }
         }
-
- */
+    }
+}

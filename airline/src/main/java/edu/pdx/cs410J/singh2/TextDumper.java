@@ -5,9 +5,8 @@ import edu.pdx.cs410J.AbstractFlight;
 import edu.pdx.cs410J.AirlineDumper;
 
 import java.io.*;
-import java.util.ArrayList;
+
 import java.util.Collection;
-import java.util.Collections;
 
 /**
   takes the contents of an airline and writes it out to a text file
@@ -36,7 +35,7 @@ public class TextDumper implements AirlineDumper {
     public void dump(AbstractAirline airline) throws IOException{
 
         try {
-            Collection<AbstractFlight> flightList;
+            Collection<Flight> flightList;
             flightList = airline.getFlights();
 
             Writer writer;
@@ -49,9 +48,9 @@ public class TextDumper implements AirlineDumper {
 
             for (AbstractFlight flight: flightList) {
                 writer.write(flight.getNumber() + " ");
-                writer.write(((Flight) flight).getSourceThreeLetterCode() + " ");
+                writer.write(((Flight) flight).getSource() + " ");
                 writer.write(((Flight) flight).getDepartYearFourDigits() + " ");
-                writer.write(((Flight) flight).getDestThreeLetterCode() + " ");
+                writer.write(((Flight) flight).getDestination() + " ");
                 writer.write(((Flight) flight).getArrivalYearFourDigits());
                 writer.write("\n");
             }

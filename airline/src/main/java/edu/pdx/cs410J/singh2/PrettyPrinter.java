@@ -3,7 +3,6 @@ package edu.pdx.cs410J.singh2;
 import edu.pdx.cs410J.AbstractAirline;
 import edu.pdx.cs410J.AbstractFlight;
 import edu.pdx.cs410J.AirlineDumper;
-import edu.pdx.cs410J.ParserException;
 
 import java.io.*;
 import java.util.Collection;
@@ -18,10 +17,22 @@ import java.util.Collection;
 public class PrettyPrinter implements AirlineDumper {
     private String fileName;
 
+    /**
+     * name of the file
+     * @param fileName
+     *        name of the file
+     */
     public PrettyPrinter(String fileName) {
         this.fileName = fileName;
     }
 
+    /**
+     * dumps the airline object to text file
+     * @param airline
+     *        airline object
+     * @throws IOException
+     *         throw IOException
+     */
     public void dump(AbstractAirline airline) throws IOException {
         try {
             Collection<AbstractFlight> flightList;
@@ -42,12 +53,12 @@ public class PrettyPrinter implements AirlineDumper {
             writer.write("Flight #\tDeparture\t\t\tDeparture Date & Time\t\t\tDestination\t\t\tArrival Date & Time\t\tDuration\n");
             writer.write("--------\t---------\t\t\t---------------------\t\t\t-----------\t\t\t-------------------\t\t--------\n");
 
-            // convert time duration into minutes
+            // 432 Portland OR, Sat Dec 27, 2010 1:22 PST LAX etc
             for (AbstractFlight flight: flightList) {
                 writer.write(flight.getNumber() + "\t\t\t");
-                writer.write(flight.getSource() + "\t");
-                writer.write(flight.getDeparture() + "\t");
-                writer.write(flight.getDestination() + "\t");
+                writer.write(((Flight) flight).getSrcCode() + "\t");
+                writer.write(flight.getDepartureString() + "\t\t") ;
+                writer.write(((Flight) flight).getDestCode() + "\t");
                 writer.write(flight.getArrival() + "\t" + ((Flight) flight).getDuration() + "\n");
             }
 
