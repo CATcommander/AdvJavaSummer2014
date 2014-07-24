@@ -7,6 +7,9 @@ import edu.pdx.cs410J.ParserException;
 
 import javax.swing.text.html.parser.Parser;
 import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 /**
@@ -95,6 +98,14 @@ public class TextParser implements AirlineParser {
                     throw new ParserException("File Read Error: Invalid Flight Number");
                 }
 
+                // make a simpledateformat to check the format here, if valid pass to functions
+             /*   SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/YYYY hh:mm a");
+                try {
+                    Date date = simpleDateFormat.parse(args[2] + " " + args[3] + " " + args[4]);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+*/
                 checkCode(src);
                 checkDate(departDate);
                 checkTime(departTime);
@@ -105,7 +116,10 @@ public class TextParser implements AirlineParser {
                 checkTime(arriveTime);
                 checkDay(arrivalDay);
 
-                flight = new Flight(flightNumber, src, departDate + " " + departTime, departDay, dest, arriveDate + " " + arriveTime, arrivalDay);
+                String depart = departDate + " " + departTime + " " + departDay;
+                String arrive = arriveDate + " " + arriveTime + " " + arrivalDay;
+
+                flight = new Flight(flightNumber, src, depart, departDay, dest, arrive, arrivalDay);
 
                 airline.addFlight(flight);
             }
@@ -123,6 +137,8 @@ public class TextParser implements AirlineParser {
                 throw new ParserException("File Read Error: Invalid Three-Letter source code");
             else if (ex.getMessage().contains("File Read Error: Invalid Three-Letter destination code"))
                 throw new ParserException("File Read Error: Invalid Three-Letter destination code");
+            else if (ex.getMessage().contains("File Read Error: Invalid Three-Letter code"))
+                throw new ParserException("File Read Error: Invalid Three-Letter code");
             else if (ex.getMessage().contains("Invalid Format"))
                 throw new ParserException("Invalid Format");
             else if (ex.getMessage().contains("File Read Error: Invalid Time"))
@@ -256,15 +272,14 @@ public class TextParser implements AirlineParser {
     private static String checkCode(String arg) throws ParserException {
         for (char c: arg.toCharArray()) {
             if (arg.length() != 3 || Character.isDigit(c)) {
-                throw new ParserException("File Read Error: Invalid Three-Letter destination code");
+                throw new ParserException("File Read Error: Invalid Three Letter destination code");
             }
         }
         String validCode = AirportNames.getName(arg.toUpperCase());
 
         if (validCode == null)
-            throw new ParserException("File Read Error: Invalid Three-Letter destination code");
-
-        return validCode;
+            throw new ParserException("File Read Error: Invalid Three Letter destination code");
+        return arg;
     }
 
 }

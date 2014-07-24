@@ -5,6 +5,10 @@ import edu.pdx.cs410J.AirportNames;
 import edu.pdx.cs410J.ParserException;
 
 import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * The main class for the CS410J airline Project
@@ -96,6 +100,17 @@ public class Project3 {
                 printUsageAndExit(INVALID_DATE);
                 throw new AssertionError("Unreachable statement");
             }
+        }
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.US);
+        simpleDateFormat.setLenient(false);
+        Date date1 = null;
+
+        try {
+            date1 = simpleDateFormat.parse(args);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
 
         String date[] = args.split("/");
@@ -213,7 +228,7 @@ public class Project3 {
         if (validCode == null)
             printUsageAndExit("ERROR: Airport code \'" +  arg + "\' does not exist");
 
-        return validCode;
+        return arg;
     }
 
     /**
@@ -352,6 +367,11 @@ public class Project3 {
         // ERROR CHECKING
         checkErrosInCommandLine(hasNoFlag, hasPrintFlag, prettyFlag, textFileFlag, args);
 
+        if (textFileFlag && prettyFlag) {
+            if (args[fileLocation].compareToIgnoreCase(args[prettyFile]) == 0)
+                printUsageAndExit("ERROR: textFile and pretty cannot use the SAME file. \nPlease use a different file for pretty print");
+        }
+
         if (prettyFlag && !textFileFlag && !hasPrintFlag && args.length <= 12) {
             System.out.println("pretty flag detected");
         }
@@ -400,10 +420,17 @@ public class Project3 {
         if (hasPrintFlag && !textFileFlag) {
             i = 1;
         }
+
         if (hasNoFlag)
             i = 0;
-        if (prettyFlag)
+        if (prettyFlag && !textFileFlag && !hasPrintFlag)
             i = 2;
+        if (prettyFlag && hasPrintFlag)
+            i = 3;
+        if (prettyFlag && textFileFlag)
+            i = 4;
+        if (prettyFlag && hasPrintFlag && textFileFlag)
+            i = 5;
 
         airlineName = args[i];
         // if parsed airline is empty, make a new airline
@@ -430,6 +457,9 @@ public class Project3 {
 
         if (hasPrintFlag)
             System.out.println(flight.toString());
+
+        PrettyPrinter prettyPrinter;
+
         if (textFileFlag) {
             fileName = args[fileLocation];
             if (!fileName.endsWith(".txt"))
@@ -442,6 +472,25 @@ public class Project3 {
                 throw new ParserException("Airline does not match");
             }
         }
+
+        if (prettyFlag || textFileFlag) {
+            fileName = args[prettyFile];
+            if (!fileName.endsWith(".txt"))
+                fileName = fileName + ".txt";
+
+            file = new File(fileName);
+
+            try {
+                file.createNewFile();
+            } catch (IOException e1){
+                throw new ParserException("File Write Error");
+            }
+
+            prettyPrinter = new PrettyPrinter(fileName);
+            prettyPrinter.dump(airline);
+        }
+
+
         System.exit(0);
     }
 

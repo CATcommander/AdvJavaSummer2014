@@ -1,12 +1,14 @@
 package edu.pdx.cs410J.singh2;
 
 import edu.pdx.cs410J.AbstractFlight;
+import edu.pdx.cs410J.AirportNames;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TreeSet;
 
 /**
  * This class has information about a Flight which extends
@@ -62,7 +64,8 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      */
     @Override
     public Date getDeparture() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.US);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/YYYY hh:mm a", Locale.US);
+        simpleDateFormat.setLenient(false);
 
         Date date = null;
 
@@ -83,9 +86,7 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      *         returns validated DateFormat Arrival string
      */
     public String getDepartureString() {
-        System.out.println("depart time " + departTime);
-
-        return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(this.getDeparture());
+        return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(this.getDeparture());
     }
 
     /**
@@ -95,8 +96,20 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * returns the name of departure airport
      */
     public String getSource() {
+        String airportName = null;
+
+        airportName = AirportNames.getName(this.source.toUpperCase());
+        if (airportName != null)
+            return airportName;
+        System.out.println(airportName);
         return source;
     }
+
+    public String getSourceThreeLetterCode() {
+        System.out.println(source);
+        return source;
+    }
+
 
     /**
      * Just returns the name of flight's destination airport
@@ -105,9 +118,20 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * returns the name of destination airport
      */
     public String getDestination() {
+        String airportName;
+
+        airportName = AirportNames.getName(this.destination.toUpperCase());
+        if (airportName != null)
+            return airportName;
+        System.out.println(airportName);
         return destination;
     }
 
+
+    public String getDestThreeLetterCode() {
+        System.out.println(destination);
+        return destination;
+    }
     /**
      * Returns the Date object with validated and formatted date
      *
@@ -116,7 +140,9 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
     @Override
     public Date getArrival() {
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.US);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/YYYY hh:mm a", Locale.US);
+        simpleDateFormat.setLenient(false);
+
         Date date = null;
 
         try {
@@ -128,6 +154,21 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
         return date;
     }
 
+    public long getDuration() {
+        long minutes;
+
+        minutes = (this.getArrival().getTime() - this.getDeparture().getTime())/60000;
+        System.out.println("duration: " + minutes);
+        return minutes;
+    }
+
+    public String getDepartYearFourDigits() {
+        return departTime;
+    }
+
+    public String getArrivalYearFourDigits() {
+        return arriveTime;
+    }
     /**
      * Returns Arrival string that is formatted using DateFormat.SHORT
      *
@@ -135,9 +176,6 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      *         returns validated DateFormat Arrival string
      */
     public String getArrivalString() {
-
-        System.out.println(arrivalDay + "arrival time " + arriveTime);
-
         return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(this.getArrival());
     }
 
@@ -147,6 +185,43 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
         // return -1 THIS object is less than the flight
         // return 1 THIS object is greater than the flight
 
-        return (this.source.compareTo(flight.source) == 0) ? (this.departTime.compareTo(flight.departTime)) : 0;
+        //if (this.getSource().compareTo(flight.getSource()) != 0)
+          //  return (this.getSource().compareTo(flight.getSource()));
+
+        //return (this.getSource().compareTo(flight.getSource()) == 0) ? (this.getDepartureString().compareTo(flight.getDepartureString())) : 0;
+        if(this.getSource().compareTo((flight).getSource()) != 0) {
+            return (this.getSource().compareTo(flight.getSource()));
+        }
+        else
+            return this.getDepartureString().compareTo(flight.getDepartureString());
     }
+
+
 }
+
+/*
+
+public int compareTo(Flight o) {
+        if(this.getSource().compareTo((o).getSource()) != 0) {
+            return (this.getSource().compareTo(o.getSource()));
+        }
+        else
+            return this.getDepartureString().compareTo(o.getDepartureString());
+    }
+
+
+int result = this.source1.compareTo(o.getSource());
+
+        if (result == 0) {
+            int result1 = this.departureDateTime.compareTo(o.getDeparture());
+            if (result1 == 0) {
+                return 0;
+            } else {
+                return result1;
+            }
+
+        } else {
+            return result;
+        }
+
+ */

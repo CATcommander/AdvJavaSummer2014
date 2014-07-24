@@ -3,7 +3,7 @@ package edu.pdx.cs410J.singh2;
 import edu.pdx.cs410J.AbstractAirline;
 import edu.pdx.cs410J.AbstractFlight;
 
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * This class holds information about all the airlines
@@ -11,7 +11,7 @@ import java.util.ArrayList;
  */
 public class Airline extends AbstractAirline{
 
-    private ArrayList<AbstractFlight> listOfFlights;
+    private ArrayList<Flight> listOfFlights;
     private String AirlineName;
 
     /** creates new <code> Airline </code>
@@ -22,7 +22,7 @@ public class Airline extends AbstractAirline{
      */
     public Airline(String AirlineName) {
         this.AirlineName = AirlineName;
-        listOfFlights = new ArrayList<AbstractFlight>();
+        listOfFlights = new ArrayList<Flight>();
     }
 
     /**
@@ -39,7 +39,7 @@ public class Airline extends AbstractAirline{
      * @return listOfFlight
      *         list of flights
      */
-    public ArrayList<AbstractFlight> getFlights() {
+    public Collection<Flight> getFlights() {
         return listOfFlights;
     }
 
@@ -50,8 +50,8 @@ public class Airline extends AbstractAirline{
      */
     public void addFlight(AbstractFlight flightToAdd) {
 
-        listOfFlights.add(flightToAdd);
-        //listOfFlights.sort(flightToAdd);
+        listOfFlights.add(((Flight) flightToAdd));
+        Collections.sort(listOfFlights);
     }
 
 }

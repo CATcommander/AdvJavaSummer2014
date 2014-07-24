@@ -3,6 +3,7 @@ package edu.pdx.cs410J.singh2;
 import edu.pdx.cs410J.AbstractAirline;
 import edu.pdx.cs410J.AbstractFlight;
 import edu.pdx.cs410J.AirlineDumper;
+import edu.pdx.cs410J.ParserException;
 
 import java.io.*;
 import java.util.Collection;
@@ -26,24 +27,28 @@ public class PrettyPrinter implements AirlineDumper {
             Collection<AbstractFlight> flightList;
             flightList = airline.getFlights();
 
-
             Writer writer;
+
+            if (flightList == null)
+                throw new AssertionError("Empty Airline List");
 
             writer = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(fileName), "UTF-8"));
 
-            writer.write("Airline: " + airline.getName());
+            writer.write(airline.toString());
             writer.write("\n");
 
+            // print out the headers
+            writer.write("Flight #\tDeparture\t\t\tDeparture Date & Time\t\t\tDestination\t\t\tArrival Date & Time\t\tDuration\n");
+            writer.write("--------\t---------\t\t\t---------------------\t\t\t-----------\t\t\t-------------------\t\t--------\n");
 
             // convert time duration into minutes
             for (AbstractFlight flight: flightList) {
-                writer.write("Flight Number: " + flight.getNumber() + "\n");
-                writer.write("From: " + flight.getSource());
-                writer.write(flight.getDepartureString() + " " + flight.getDeparture() + "\n");
-                writer.write("To: " + flight.getDestination() + " ");
-                writer.write(flight.getArrivalString() + " " + flight.getArrival());
-                writer.write("\n");
+                writer.write(flight.getNumber() + "\t\t\t");
+                writer.write(flight.getSource() + "\t");
+                writer.write(flight.getDeparture() + "\t");
+                writer.write(flight.getDestination() + "\t");
+                writer.write(flight.getArrival() + "\t" + ((Flight) flight).getDuration() + "\n");
             }
 
             writer.flush();
