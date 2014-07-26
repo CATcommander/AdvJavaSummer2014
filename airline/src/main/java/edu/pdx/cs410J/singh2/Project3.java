@@ -494,23 +494,21 @@ public class Project3 {
 
         if (prettyFlag && args[prettyFile].contains("-")) {
             // print out the headers
-            System.out.println("Flight #\tSource\t\t\tDeparture Date & Time\t\t\tDestination\t\t\tArrival Date & Time\t\t\tDuration");
-            System.out.println("--------\t------\t\t\t---------------------\t\t\t-----------\t\t\t-------------------\t\t\t--------\n");
+            System.out.print("Flight #" + "\t    Source   " + "\t\tDeparture Date & Time\t\t\t" + "Destination" + "\t\t\tArrival Date & Time\t\t\t\t" + "Duration\n");
+            System.out.print("--------" + "\t-------------" + "\t\t---------------------\t\t\t" + "-----------" + "\t\t\t-------------------\t\t\t\t" + "--------\n");
 
             Collection<Flight> flightList;
             flightList = airline.getFlights();
 
             // convert time duration into minutes
             for (AbstractFlight abstractFlight: flightList) {
-                System.out.print(abstractFlight.getNumber() + "\t\t\t");
-                System.out.print(((Flight) abstractFlight).getSrcCode() + "\t");
+                System.out.print("   " + abstractFlight.getNumber() + "\t\t");
+                System.out.print(((Flight) abstractFlight).getSrcCode() + "\t\t");
                 System.out.print(abstractFlight.getDeparture() + "\t");
-                System.out.print(((Flight) abstractFlight).getDestCode() + "\t");
-                System.out.print("\t" + abstractFlight.getArrival() + "\t" + ((Flight) abstractFlight).getDuration() + "\n");
+                System.out.print(((Flight) abstractFlight).getDestCode() + "\t\t");
+                System.out.print(abstractFlight.getArrival() + "\t");
+                System.out.print(((Flight) abstractFlight).getDuration() + "\n");
             }
-
-            System.out.println(String.format("%-7s= %sflgiht" , "Flight", "blah" ));
-
         }
 
         if (prettyFlag && !textFileFlag && !hasPrintFlag && !args[prettyFile].contains("-")) {
