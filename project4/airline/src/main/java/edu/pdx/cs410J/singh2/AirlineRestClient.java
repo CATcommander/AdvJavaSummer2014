@@ -32,15 +32,21 @@ public class AirlineRestClient extends HttpRequestHelper
      */
     public Response getAllKeysAndValues() throws IOException
     {
-        return get(this.url );
+        return get(this.url);
     }
 
     /**
      * Returns all values for the given key
      */
-    public Response getValues( String key ) throws IOException
+   /* public Response getValues( String key ) throws IOException
     {
         return get(this.url, "key", key);
+    }*/
+
+    // returns all flights for the given airline
+    public Response getFlights(String name) throws IOException
+    {
+        return get(this.url, "name", name);
     }
 
     public Response addKeyValuePair( String key, String value ) throws IOException
@@ -50,11 +56,13 @@ public class AirlineRestClient extends HttpRequestHelper
 
     // post (this.url, "airline", airline, "flight number", flight number, "src", src)
 
-    public Response addNewFlight(String... args) throws IOException {
-        String airlineName = args[0];
-        String flightNumber = args[1];
-        String src = args[2], dest = args[3];
-        String departTime = args[4], arriveTime = args[5];
+    public Response addNewFlight(String name, String fn, String s, String dt, String de, String at) throws IOException {
+        String airlineName = name;
+        String flightNumber = fn;
+        String src = s;
+        String departTime = dt;
+        String dest = de;
+        String arriveTime = at;
 
         return post(this.url, "name", airlineName, "flightNumber", flightNumber, "src", src, "departTime", departTime, "dest", dest, "arriveTime", arriveTime);
     }

@@ -6,6 +6,7 @@ import edu.pdx.cs410J.web.HttpRequestHelper;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -275,6 +276,11 @@ public class Project4 {
         if (hasPrintFlag && search && !host && !port && (args.length > 12 || args.length < 13))
             error("Error: Unknown command line argument");
 
+        if (host && !port)
+            error("Error: Missing Port");
+        if (!host && port)
+            error("Error: Missing Host");
+
         // only host and no port
         if (host && !port && (args.length > 12 || args.length < 12))
             error("Error: Missing Host" + USAGE);
@@ -299,10 +305,12 @@ public class Project4 {
     public static void main(String... args) throws ParserException {
         String hostName = null;
         String portString = null;
-        String key = null;
-        String value = null;
 
         int i = 0;
+        int host = 0;
+        int portNumber = 0;
+        int search = 0;
+        int counter = 0;
 
         boolean hasREADMEFlag = false;
         boolean hasPrintFlag = false;
@@ -318,11 +326,12 @@ public class Project4 {
             }
         }
 
-        if (args.length < 10 || args.length > 16)
+        if (args.length < 8 || args.length > 16)
             error("Not enough or too many command line arguments");
 
         // loop through the args to check if options exist(options can be in any order)
         for (String s : args) {
+            counter++;
             if (s.compareToIgnoreCase("-README") == 0) {
                 hasREADMEFlag = true;
             }
@@ -330,12 +339,15 @@ public class Project4 {
                 hasPrintFlag = true;
             }
             else if (s.compareToIgnoreCase("-host") == 0) {
+                host = counter;
                 hasHostFlag = true;
             }
             else if (s.compareToIgnoreCase("-port") == 0) {
+                portNumber = counter;
                 hasPortFlag = true;
             }
             else if (s.compareToIgnoreCase("-search") == 0) {
+                search = counter;
                 hasSearchFlag = true;
             }
             // if invalid flag is given, error out
@@ -361,12 +373,19 @@ public class Project4 {
 
         // if both host and port are given
         if (hasHostFlag && hasPortFlag) {
+
+            if(args[host].compareToIgnoreCase("-port") == 0 || args[portNumber].compareToIgnoreCase("-host") == 0) {
+                error("Error: Unknown command line argument" + USAGE);
+            }
             hostName = args[1];
             portString = args[3];
 
             i = 4;
             // if there is search flag
             if (hasSearchFlag) {
+                if(args[search].compareToIgnoreCase("-port") == 0 || args[search].compareToIgnoreCase("-host") == 0) {
+                    error("Error: Unknown command line argument" + USAGE);
+                }
                 i = 5;
                 System.out.println("has search flag");
             }
@@ -400,14 +419,39 @@ public class Project4 {
         String arriveTime = validateDateAndTime(args[i + 7] + " " + args[i + 8] + " " + args[i + 9]);
 
         AirlineRestClient client = new AirlineRestClient(hostName, port);
+
         System.out.println(hostName + " port: " + portString);
 
         HttpRequestHelper.Response response;
+
+        // create an airline and flight
+        Airline airline = new Airline(name);
+        Flight flight = new Flight(flightNumber, src, departTime, dest, arriveTime);
+
+        String flightString = Integer.toString(flightNumber);
+
+        // add the flight to the airline
+//        airline.addFlight(flight);
+        try {
+            response = client.addNewFlight(name, flightString, src, departTime, dest, arriveTime);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            response = client.getAllKeysAndValues();
+            System.out.println("response get content: " + response.getContent());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+/*
         try {
             if (key == null) {
                 // Print all key/value pairs
                 response = client.getAllKeysAndValues();
-
             } else if (value == null) {
                 // Print all values of key
                 response = client.getValues(key);
@@ -423,8 +467,8 @@ public class Project4 {
             error("While contacting server: " + ex);
             return;
         }
-
-        System.out.println(response.getContent());
+*/
+        //      System.out.println(response.getContent());
 
         System.exit(0);
     }

@@ -28,11 +28,36 @@ public class AirlineServlet extends HttpServlet
         String src = getParameter("src", request);
         String dest = getParameter("dest", request);
 
-        if (name != null && src == null && dest == null) {
-            writeValue(name, response);
+        System.out.println("name in doGet : " + name);
+
+        if (name != null) {
+//            writeValue(name, response);
+            Airline airline = airlineMap.get(name);
+            PrintWriter wr = response.getWriter();
+
+            wr.println("name is not null");
+
+            //prettyPrint(airline, response);
+            wr.println("name is: " + name + "\nairline's name " + airline.getName());
+
+            wr.flush();
 
         } else {
-            writeAllMappings(response);
+            System.out.println("else name is NULL");
+
+            PrintWriter pw = response.getWriter();
+
+            pw.println("in doGet method else case");
+
+            for (Map.Entry<String, Airline> entry : this.airlineMap.entrySet()) {
+                pw.print("\ngetKey in doGet: " + entry.getKey());
+                pw.println(" -> " + entry.getValue().getFlights().toString());
+            }
+
+            pw.flush();
+
+
+            //writeAllMappings(response);
         }
 
         // search flag is given
@@ -61,7 +86,9 @@ public class AirlineServlet extends HttpServlet
             missingRequiredParameter( response, flightNum );
             return;
         }
+
         int flightNumber = 0;
+
         if (flightNum != null) {
             try {
                 flightNumber = Integer.parseInt(flightNum);
@@ -93,13 +120,22 @@ public class AirlineServlet extends HttpServlet
             missingRequiredParameter( response, arriveTime );
             return;
         }
-        Airline airline;
+
+        Airline airline = airlineMap.get(key);
         Flight flight;
 
-        airline = new Airline(key); // getParameter. name of the airline
-        flight = new Flight(flightNumber, src, departTime, dest, arriveTime);
+        // if airline does not exist, create a new one
+        if (airline == null) {
+            airline = new Airline(key); // getParameter. name of the airline
+            System.out.println("\n>>created new airline: " + airline.getName());
+        }
+        else { // it does exist
+            System.out.println("\n>>airline already exist: " + airline.getName());
+            flight = new Flight(flightNumber, src, departTime, dest, arriveTime);
+            airline.addFlight(flight);
+            System.out.println("flight added: " + flight.toString());
+        }
 
-        airline.addFlight(flight);
         this.airlineMap.put(key, airline);
 
         PrintWriter pw = response.getWriter();
@@ -120,13 +156,14 @@ public class AirlineServlet extends HttpServlet
         
         response.setStatus( HttpServletResponse.SC_PRECONDITION_FAILED );
     }
+/*
 
     private void writeValue( String key, HttpServletResponse response ) throws IOException
     {
         Airline value = this.airlineMap.get(key);
 
         PrintWriter pw = response.getWriter();
-
+        System.out.println("in writeValue");
         //pw.println(Messages.getMappingCount( value != null ? 1 : 0 ));
         //pw.println(Messages.formatKeyValuePair( key, value.getName() ));
 
@@ -148,6 +185,7 @@ public class AirlineServlet extends HttpServlet
 
         response.setStatus( HttpServletResponse.SC_OK );
     }
+*/
 
     private String getParameter(String name, HttpServletRequest request) {
       String value = request.getParameter(name);
