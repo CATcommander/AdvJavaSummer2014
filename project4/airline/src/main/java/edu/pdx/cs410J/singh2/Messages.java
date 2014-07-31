@@ -21,8 +21,8 @@ public class Messages
         return String.format("The required parameter \"%s\" is missing", key);
     }
 
-    public static String mappedKeyValue( String key, String value )
+    public static String mappedKeyValue( String key, Airline value )
     {
-        return String.format( "Mapped %s to %s", key, value );
+        return String.format( "Mapped %s to %s", key, value.getName() );
     }
 }

@@ -47,4 +47,16 @@ public class AirlineRestClient extends HttpRequestHelper
     {
         return post( this.url, "key", key, "value", value );
     }
+
+    // post (this.url, "airline", airline, "flight number", flight number, "src", src)
+
+    public Response addNewFlight(String... args) throws IOException {
+        String airlineName = args[0];
+        String flightNumber = args[1];
+        String src = args[2], dest = args[3];
+        String departTime = args[4], arriveTime = args[5];
+
+        return post(this.url, "name", airlineName, "flightNumber", flightNumber, "src", src, "departTime", departTime, "dest", dest, "arriveTime", arriveTime);
+    }
+
 }

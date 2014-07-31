@@ -179,6 +179,10 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
         return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(this.getArrival());
     }
 
+    public void validateFlight() {
+
+    }
+
     /**
      * get duration in minutes
      * @return returns flight duration in minutes
