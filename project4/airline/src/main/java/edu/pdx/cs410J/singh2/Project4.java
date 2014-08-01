@@ -430,7 +430,7 @@ public class Project4 {
             }
 
             if (hasPrintFlag)
-                System.out.println(response.getContent());
+                System.out.println(name + " " + flightNumber + " " + src.toUpperCase() + " " + departTime + " " + dest.toUpperCase() + " " + arriveTime);
         }
 
         // if there is search flag
