@@ -1,10 +1,5 @@
 package edu.pdx.cs410J.singh2;
 
-
-import edu.pdx.cs410J.AbstractAirline;
-import edu.pdx.cs410J.AbstractFlight;
-
-import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -54,22 +49,18 @@ public class AirlineServlet extends HttpServlet
         }
         else {
 
+
             if (!airlineMap.isEmpty()) {
+                wr.write("Server contains " + airlineMap.size() + " airlines.\n");
                 for (Map.Entry<String, Airline> entry : airlineMap.entrySet()) {
-                    wr.write(entry.getKey() + " -- > ");
-                    wr.write(entry.getValue().toString());
+                    prettyPrint(entry.getValue(), response);
                 }
             }
             else
-                wr.write("\nDatabase is Empty");
+                wr.write("\nServer contains 0 airline(s)");
 
             wr.flush();
         }
-       /* else {
-            wr.println("Error: An unexpected error has occured");
-            throw new ServletException("Servor Error");
-        }*/
-
     }
 
     @Override
@@ -184,9 +175,9 @@ public class AirlineServlet extends HttpServlet
             if (flight.getSource().compareToIgnoreCase(s) == 0 && flight.getDestination().compareToIgnoreCase(d) == 0) {
                 printWriter.write("Flight " + flight.getNumber());
                 printWriter.write(" Departs " + flight.getSrcCode());
-                printWriter.write(" at " + flight.getDeparture());
+                printWriter.write(" at " + flight.getDepartLONG());
                 printWriter.write(" Arrives " + flight.getDestCode());
-                printWriter.write(" at " + flight.getArrival() + " Duration " + flight.getDuration() + " minutes\n");
+                printWriter.write(" at " + flight.getArrivalLONG() + ". Duration: " + flight.getDuration() + " minutes\n");
                 found = true;
             }
         }
@@ -198,9 +189,9 @@ public class AirlineServlet extends HttpServlet
 
     }
 
-    private void prettyPrint(AbstractAirline airline, HttpServletResponse response) {
+    private void prettyPrint(Airline airline, HttpServletResponse response) {
         try {
-            Collection<AbstractFlight> flightList;
+            Collection<Flight> flightList;
             flightList = airline.getFlights();
 
             PrintWriter writer = response.getWriter();
@@ -211,12 +202,12 @@ public class AirlineServlet extends HttpServlet
             writer.write("\nAirline " + airline.toString() + "\n");
 
             // 432 Portland OR, Sat Dec 27, 2010 1:22 PST LAX etc
-            for (AbstractFlight flight : flightList) {
+            for (Flight flight : flightList) {
                 writer.write("Flight " + flight.getNumber());
-                writer.write(" Departs " + ((Flight) flight).getSrcCode());
-                writer.write(" at " + flight.getDeparture());
-                writer.write(" Arrives " + ((Flight) flight).getDestCode());
-                writer.write(" at " + flight.getArrival() + " Duration " + ((Flight) flight).getDuration() + " minutes\n");
+                writer.write(" Departs " + flight.getSrcCode());
+                writer.write(" at " + flight.getDepartLONG());
+                writer.write(" Arrives " + flight.getDestCode());
+                writer.write(" at " + flight.getArrivalLONG() + ". Duration: " + flight.getDuration() + " minutes\n");
             }
             writer.flush();
             response.setStatus(HttpServletResponse.SC_OK);

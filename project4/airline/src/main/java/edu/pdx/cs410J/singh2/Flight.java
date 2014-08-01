@@ -100,9 +100,6 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * returns the year in four digits
      * @return returns the year in four digits
      */
-    public String getDepartYearFourDigits() {
-        return departTime;
-    }
 
     /**
      * returns full three letter code
@@ -127,6 +124,10 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      */
     public String getDestination() {
         return destination.toUpperCase();
+    }
+
+    public String getDepartLONG() {
+        return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(this.getDeparture());
     }
 
     /**
@@ -163,13 +164,6 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
     }
 
     /**
-     * returns the year in four digits
-     * @return returns the year in four digits
-     */
-    public String getArrivalYearFourDigits() {
-        return arriveTime;
-    }
-    /**
      * Returns Arrival string that is formatted using DateFormat.SHORT
      *
      * @return arriveTime
@@ -179,8 +173,8 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
         return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(this.getArrival());
     }
 
-    public void validateFlight() {
-
+    public String getArrivalLONG() {
+        return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(this.getArrival());
     }
 
     /**

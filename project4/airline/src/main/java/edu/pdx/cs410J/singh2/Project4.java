@@ -418,8 +418,6 @@ public class Project4 {
 
             String flightString = Integer.toString(flightNumber);
 
-            // add the flight to the airline
-//        airline.addFlight(flight);
             try {
                 response = client.addNewFlight(name, flightString, src, departTime, dest, arriveTime);
                 System.out.println("Added?\n " + response.getContent());
