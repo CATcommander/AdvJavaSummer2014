@@ -6,8 +6,6 @@ import edu.pdx.cs410J.web.HttpRequestHelper;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.net.HttpURLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -424,7 +422,7 @@ public class Project4 {
 //        airline.addFlight(flight);
             try {
                 response = client.addNewFlight(name, flightString, src, departTime, dest, arriveTime);
-                System.out.println("add new flight " + response.getContent());
+                System.out.println("Added?\n " + response.getContent());
 
             } catch (IOException e) {
                 e.printStackTrace();
