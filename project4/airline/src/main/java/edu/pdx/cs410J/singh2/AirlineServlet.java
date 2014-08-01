@@ -11,8 +11,15 @@ import java.util.Map;
 
 public class AirlineServlet extends HttpServlet
 {
-    private final Map<String, Airline> airlineMap = new HashMap<>();
+    private final Map<String, Airline> airlineMap = new HashMap<String, Airline>();
 
+    /**
+     * handles GET request from client
+     * @param request request URL from the client
+     * @param response server's response to client's request
+     * @throws ServletException server side error
+     * @throws IOException
+     */
     @Override
     protected void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
     {
@@ -30,7 +37,7 @@ public class AirlineServlet extends HttpServlet
             airline = airlineMap.get(name);
 
             if (airline == null) {
-                wr.println("\'" + name + "\' does not exist");
+                wr.println("Error: Airline \'" + name + "\' does not exist");
             }
             else {
                 prettySearch(airline, src, dest, response);
@@ -40,7 +47,7 @@ public class AirlineServlet extends HttpServlet
             Airline airline = airlineMap.get(name);
 
             if (airline == null) {
-                wr.println("ERROR: \'" + name + "\' does not exist");
+                wr.println("Error: Airline \'" + name + "\' does not exist");
             }
             else {
                 prettyPrint(airline, response);
@@ -48,7 +55,6 @@ public class AirlineServlet extends HttpServlet
             wr.flush();
         }
         else {
-
 
             if (!airlineMap.isEmpty()) {
                 wr.write("Server contains " + airlineMap.size() + " airlines.\n");
@@ -63,6 +69,13 @@ public class AirlineServlet extends HttpServlet
         }
     }
 
+    /**
+     * handles POST method
+     * @param request request URL from the client
+     * @param response server's response to client's request
+     * @throws ServletException server side error
+     * @throws IOException
+     */
     @Override
     protected void doPost( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
     {
@@ -120,24 +133,26 @@ public class AirlineServlet extends HttpServlet
         // if airline does not exist, create a new one
         if (airline == null) {
             airline = new Airline(key); // getParameter. name of the airline
-            flight = new Flight(flightNumber, src, departTime, dest, arriveTime);
-            airline.addFlight(flight);
         }
-        else { // it does exist
-            flight = new Flight(flightNumber, src, departTime, dest, arriveTime);
-            airline.addFlight(flight);
-        }
+
+        flight = new Flight(flightNumber, src, departTime, dest, arriveTime);
+        airline.addFlight(flight);
 
         this.airlineMap.put(key, airline);
 
         PrintWriter pw = response.getWriter();
-        pw.println();
         prettyPrint(airline, response);
         pw.flush();
 
         response.setStatus( HttpServletResponse.SC_OK);
     }
 
+    /**
+     *
+     * @param response server's response to client's request
+     * @param key name of the key
+     * @throws IOException
+     */
     private void missingRequiredParameter( HttpServletResponse response, String key )
             throws IOException
     {
@@ -148,6 +163,12 @@ public class AirlineServlet extends HttpServlet
         response.setStatus( HttpServletResponse.SC_PRECONDITION_FAILED );
     }
 
+    /**
+     * get the parameter from server's response
+     * @param name name of the key
+     * @param request server's response
+     * @return return the value if found, else returns null
+     */
     private String getParameter(String name, HttpServletRequest request) {
         String value = request.getParameter(name);
         if (value == null || "".equals(value)) {
@@ -158,8 +179,16 @@ public class AirlineServlet extends HttpServlet
         }
     }
 
-    private void prettySearch(Airline airline, String s, String d, HttpServletResponse response) throws IOException {
-
+    /**
+     * A separate pretty print function for handle search
+     * @param airline airline object
+     * @param s       source
+     * @param d       destination
+     * @param response server's response
+     * @throws IOException
+     */
+    private void prettySearch(Airline airline, String s, String d, HttpServletResponse response) throws IOException
+    {
         Collection<Flight> Flights;
         Flights = airline.getFlights();
 
@@ -186,9 +215,13 @@ public class AirlineServlet extends HttpServlet
         }
 
         response.setStatus(HttpServletResponse.SC_OK);
-
     }
 
+    /**
+     * Pretty print when printing to web
+     * @param airline airline object
+     * @param response server's response to client's request
+     */
     private void prettyPrint(Airline airline, HttpServletResponse response) {
         try {
             Collection<Flight> flightList;
@@ -217,5 +250,4 @@ public class AirlineServlet extends HttpServlet
 
         }
     }
-
 }

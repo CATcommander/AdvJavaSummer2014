@@ -46,6 +46,17 @@ public class AirlineRestClient extends HttpRequestHelper
         return get(this.url, "name", airlineName, "src", src, "dest", dest);
     }
 
+    /**
+     * do a POST method with airline and flight to add to server
+     * @param name name of the airline
+     * @param fn   flight number
+     * @param s    source
+     * @param dt   depart time
+     * @param de   destination
+     * @param at   arrive time
+     * @return     post method with URL and airline and flight
+     * @throws IOException
+     */
     public Response addNewFlight(String name, String fn, String s, String dt, String de, String at) throws IOException {
         String airlineName = name;
         String flightNumber = fn;

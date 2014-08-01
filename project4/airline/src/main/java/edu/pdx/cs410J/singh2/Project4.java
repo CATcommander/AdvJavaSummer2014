@@ -4,6 +4,7 @@ import edu.pdx.cs410J.AirportNames;
 import edu.pdx.cs410J.ParserException;
 import edu.pdx.cs410J.web.HttpRequestHelper;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.text.ParseException;
@@ -16,8 +17,7 @@ import java.util.Locale;
  */
 public class Project4 {
 
-    public static final String MISSING_ARGS = "Missing command line arguments";
-    public static final String EXTRNS_ARGS = "Extraneous command line argument: ";
+    public static final String MISSING_ARGS = "Missing command line arguments\n";
 
     public static final String USAGE="\nusage: java edu.pdx.cs410J.singh2.Project4 [options] <args>" +
             "\nargs are (in this order):" +
@@ -44,10 +44,10 @@ public class Project4 {
 
         System.out.println("\nHow to run?\n----------\nBefore running the application, read the USAGE section below. " +
                 "To run this program \nenter the following on a terminal or command prompt:");
-        System.out.println("\tjava edu.pdx.cs410J.singh2.Project1 [options] <args>\n" +
-                "\tjava edu.pdx.cs410J.singh2.Project4 -print \"Air Express\" 432 PDX 01/12/2014 03:34 LAX 01/12/2014 05:40");
+        System.out.println("\tjava edu.pdx.cs410J.singh2.Project4 [options] <args>\n" +
+                "\tjava edu.pdx.cs410J.singh2.Project4 -host host -port 9909 -print \"Air Express\" 432 PDX 01/12/2014 03:34 am LAX 01/12/2014 05:40 am");
 
-        System.out.println("\nUSAGE\n-------\nNote: Arguments must be in order. Options order does not matter and they are optional.\n\n" + USAGE);
+        System.out.println("\nUSAGE\n-------\nNote: Host and Port are required! Arguments must be in order. Options order does not matter and they are optional.\n\n" + USAGE);
 
         System.exit(0);
     }
@@ -267,37 +267,41 @@ public class Project4 {
         if (hasNoFlag && args.length > 10)
             error("Error: Unknown command line argument" + USAGE);
 
+        if (!host && !port)
+            error("Error: Host and Port Missing" + MISSING_ARGS + USAGE);
+        if (host && port && search && hasPrintFlag)
+            error("Error: Unknown command line argument" + USAGE);
         // only print flag is given
         if (hasPrintFlag && !host && !port && !search && (args.length > 11 || args.length < 11))
             error("Error: Unknown command line argument" + USAGE);
 
-        if (hasPrintFlag && search && !host && !port && (args.length > 12 || args.length < 13))
-            error("Error: Unknown command line argument");
+        if (hasPrintFlag && !host && !port && (args.length > 11 || args.length < 11))
+            error("Error: Host and Port Missing" + MISSING_ARGS + USAGE);
 
         if (host && !port)
-            error("Error: Missing Port");
+            error("Error: Missing Port" + MISSING_ARGS + USAGE);
         if (!host && port)
-            error("Error: Missing Host");
+            error("Error: Missing Host" + MISSING_ARGS + USAGE);
 
         // only host and no port
         if (host && !port && (args.length > 12 || args.length < 12))
-            error("Error: Missing Host" + USAGE);
+            error("Error: Missing Host" + MISSING_ARGS + USAGE);
 
         // only port flag is given and no host
         if (port && !host && (args.length > 12 || args.length < 12))
-            error("Error: Missing Port" + USAGE);
+            error("Error: Missing Port" + MISSING_ARGS + USAGE);
 
         // if host, port and search is given
         if (host && port && search && !hasPrintFlag && (args.length > 8 || args.length < 8))
-            error("Error: Unknown command line argument");
+            error("Error: Unknown command line argument" + USAGE);
 
         // if host, port, search and print is given
-        if (host && port && search && hasPrintFlag && (args.length > 9 || args.length < 9))
-            error("Error: Unknown command line argument");
+        if (host && port && search && hasPrintFlag && (args.length > 8 || args.length < 8))
+            error("Error: Unknown command line argument" + USAGE);
 
         // only textFile and pretty flags are given
         if (host && port && !hasPrintFlag && !search && (args.length > 14 || args.length < 14))
-            error("Error: Unknown command line argument");
+            error("Error: Unknown command line argument" + USAGE);
     }
 
     public static void main(String... args) throws ParserException {
@@ -375,14 +379,13 @@ public class Project4 {
             if(args[host].compareToIgnoreCase("-port") == 0 || args[portNumber].compareToIgnoreCase("-host") == 0) {
                 error("Error: Unknown command line argument" + USAGE);
             }
+
             hostName = args[1];
             portString = args[3];
-
             i = 4;
 
             if (hasPrintFlag) {
                 i = 5;
-                System.out.println("print flag");
             }
         }
 
@@ -395,20 +398,17 @@ public class Project4 {
         try {
             port = Integer.parseInt( portString );
         } catch (NumberFormatException ex) {
-            usage("Port \"" + portString + "\" must be an integer");
+            error("Port \"" + portString + "\" must be an integer" + USAGE);
             return;
         }
 
-        String name = null, src = null, departTime = null, dest = null, arriveTime = null;
-        int flightNumber = 0;
+        String name, src, departTime, dest, arriveTime;
+        int flightNumber;
 
         AirlineRestClient client = new AirlineRestClient(hostName, port);
+        HttpRequestHelper.Response response = null;
 
-        System.out.println(hostName + " port: " + portString);
-
-        HttpRequestHelper.Response response;
-
-        if (!hasSearchFlag) {
+        if (!hasSearchFlag || hasPrintFlag) {
             name = args[i];
             flightNumber = validateFlightNumber(args[i + 1]);
             src = validateThreeLetterCode(args[i + 2]);
@@ -420,11 +420,13 @@ public class Project4 {
 
             try {
                 response = client.addNewFlight(name, flightString, src, departTime, dest, arriveTime);
-                System.out.println("Added?\n " + response.getContent());
-
+                checkResponseCode(HttpsURLConnection.HTTP_OK, response);
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            if (hasPrintFlag)
+                System.out.println(response.getContent());
         }
 
         // if there is search flag
@@ -432,15 +434,14 @@ public class Project4 {
             if(args[search].compareToIgnoreCase("-port") == 0 || args[search].compareToIgnoreCase("-host") == 0) {
                 error("Error: Unknown command line argument" + USAGE);
             }
-            System.out.println(args[6] + " " + args[7]);
+
             try {
                 response = client.search(args[5], args[6], args[7]);
                 System.out.println(response.getContent());
+                checkResponseCode(HttpsURLConnection.HTTP_OK, response);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("has search flag");
-
         }
 
         System.exit(0);
@@ -468,29 +469,6 @@ public class Project4 {
     {
         PrintStream err = System.err;
         err.println("** " + message);
-
-        System.exit(1);
-    }
-
-    /**
-     * Prints usage information for this program and exits
-     * @param message An error message to print
-     */
-    private static void usage(String message)
-    {
-        PrintStream err = System.err;
-        err.println("** " + message);
-        err.println();
-        err.println("usage: java Project4 host port [key] [value]");
-        err.println("  host    Host of web server");
-        err.println("  port    Port of web server");
-        err.println("  key     Key to query");
-        err.println("  value   Value to add to server");
-        err.println();
-        err.println("This simple program posts key/value pairs to the server");
-        err.println("If no value is specified, then all values are printed");
-        err.println("If no key is specified, all key/value pairs are printed");
-        err.println();
 
         System.exit(1);
     }

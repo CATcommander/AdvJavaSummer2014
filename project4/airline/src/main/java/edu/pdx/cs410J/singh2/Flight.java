@@ -28,7 +28,7 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
     private String arriveTime;
 
 
-    /**
+    /** Flight constructor
      * @param flightNumber number of the flight
      * @param source three-letter code of departure airport
      * @param departTime departTime date and time in DateFormat.SHORT (24-time is no longer supported)
@@ -107,8 +107,8 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * @return returns three letter code
      */
     public String getSrcCode() {
-        String airportName;
-        airportName = AirportNames.getName(this.source.toUpperCase());
+
+        String airportName = AirportNames.getName(this.source.toUpperCase());
         if (airportName != null)
             return airportName;
 
@@ -126,6 +126,10 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
         return destination.toUpperCase();
     }
 
+    /**
+     * returns the Date with LONG format into a String
+     * @return Date Format LONG String
+     */
     public String getDepartLONG() {
         return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(this.getDeparture());
     }
@@ -135,15 +139,14 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * @return returns three letter code
      */
     public String getDestCode() {
-        String airportName;
-        airportName = AirportNames.getName(this.destination.toUpperCase());
+
+        String airportName = AirportNames.getName(this.destination.toUpperCase());
         if (airportName != null)
             return airportName;
         return airportName;
     }
     /**
      * Returns the Date object with validated and formatted date
-     *
      * @return formatted Date object
      */
     @Override
@@ -173,6 +176,10 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
         return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(this.getArrival());
     }
 
+    /**
+     * returns Date Format LONG String
+     * @return Date Format LONG String
+     */
     public String getArrivalLONG() {
         return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(this.getArrival());
     }
