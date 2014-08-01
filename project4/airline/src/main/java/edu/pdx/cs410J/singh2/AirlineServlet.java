@@ -1,9 +1,10 @@
 package edu.pdx.cs410J.singh2;
 
+
 import edu.pdx.cs410J.AbstractAirline;
 import edu.pdx.cs410J.AbstractFlight;
-import edu.pdx.cs410J.web.HttpRequestHelper;
 
+import javax.net.ssl.HttpsURLConnection;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,9 +16,7 @@ import java.util.Map;
 
 public class AirlineServlet extends HttpServlet
 {
-    //private final Map<String, String> airlineMap = new HashMap<String, String>();
-    private final Map<String, Airline> airlineMap = new HashMap<String, Airline>();
-
+    private final Map<String, Airline> airlineMap = new HashMap<>();
 
     @Override
     protected void doGet( HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
@@ -28,46 +27,49 @@ public class AirlineServlet extends HttpServlet
         String src = getParameter("src", request);
         String dest = getParameter("dest", request);
 
-        System.out.println("name in doGet : " + name);
+        PrintWriter wr = response.getWriter();
 
-        if (name != null) {
-//            writeValue(name, response);
+        // search flag
+        if (name != null && src != null && dest != null) {
+            Airline airline;
+            airline = airlineMap.get(name);
+
+            if (airline == null) {
+                wr.println("\'" + name + "\' does not exist");
+            }
+            else {
+                prettySearch(airline, src, dest, response);
+            }
+        }
+        else if (name != null) {
             Airline airline = airlineMap.get(name);
-            PrintWriter wr = response.getWriter();
 
-            wr.println("name is not null");
+            if (airline == null) {
+                wr.println("ERROR: \'" + name + "\' does not exist");
+            }
+            else {
+                prettyPrint(airline, response);
+            }
+            wr.flush();
+        }
+        else {
 
-            //prettyPrint(airline, response);
-            wr.println("name is: " + name + "\nairline's name " + airline.getName());
+            if (!airlineMap.isEmpty()) {
+                for (Map.Entry<String, Airline> entry : airlineMap.entrySet()) {
+                    wr.write(entry.getKey() + " -- > ");
+                    wr.write(entry.getValue().toString());
+                }
+            }
+            else
+                wr.write("\nDatabase is Empty");
 
             wr.flush();
-
-        } else {
-            System.out.println("else name is NULL");
-
-            PrintWriter pw = response.getWriter();
-
-            pw.println("in doGet method else case");
-
-            for (Map.Entry<String, Airline> entry : this.airlineMap.entrySet()) {
-                pw.print("\ngetKey in doGet: " + entry.getKey());
-                pw.println(" -> " + entry.getValue().getFlights().toString());
-            }
-
-            pw.flush();
-
-
-            //writeAllMappings(response);
         }
+       /* else {
+            wr.println("Error: An unexpected error has occured");
+            throw new ServletException("Servor Error");
+        }*/
 
-        // search flag is given
-    //    if (name != null && src != null && dest != null) {
-      //      Airline airline;
-        //    airline = airlineMap.get(name);
-          //  for (map : airlineMap) {
-
-//            }
-  //      }
     }
 
     @Override
@@ -80,7 +82,7 @@ public class AirlineServlet extends HttpServlet
             missingRequiredParameter( response, key );
             return;
         }
-// do get parameter for all the other variables such as flight number and such
+
         String flightNum = getParameter( "flightNumber", request );
         if ( flightNum == null) {
             missingRequiredParameter( response, flightNum );
@@ -89,7 +91,7 @@ public class AirlineServlet extends HttpServlet
 
         int flightNumber = 0;
 
-        if (flightNum != null) {
+        if (!flightNum.isEmpty()) {
             try {
                 flightNumber = Integer.parseInt(flightNum);
             } catch (NumberFormatException n) {
@@ -127,19 +129,17 @@ public class AirlineServlet extends HttpServlet
         // if airline does not exist, create a new one
         if (airline == null) {
             airline = new Airline(key); // getParameter. name of the airline
-            System.out.println("\n>>created new airline: " + airline.getName());
-        }
-        else { // it does exist
-            System.out.println("\n>>airline already exist: " + airline.getName());
             flight = new Flight(flightNumber, src, departTime, dest, arriveTime);
             airline.addFlight(flight);
-            System.out.println("flight added: " + flight.toString());
+        }
+        else { // it does exist
+            flight = new Flight(flightNumber, src, departTime, dest, arriveTime);
+            airline.addFlight(flight);
         }
 
         this.airlineMap.put(key, airline);
 
         PrintWriter pw = response.getWriter();
-       // pw.println(Messages.mappedKeyValue(key, airline));
         pw.println();
         prettyPrint(airline, response);
         pw.flush();
@@ -148,53 +148,54 @@ public class AirlineServlet extends HttpServlet
     }
 
     private void missingRequiredParameter( HttpServletResponse response, String key )
-        throws IOException
+            throws IOException
     {
         PrintWriter pw = response.getWriter();
         pw.println( Messages.missingRequiredParameter(key));
         pw.flush();
-        
+
         response.setStatus( HttpServletResponse.SC_PRECONDITION_FAILED );
     }
-/*
-
-    private void writeValue( String key, HttpServletResponse response ) throws IOException
-    {
-        Airline value = this.airlineMap.get(key);
-
-        PrintWriter pw = response.getWriter();
-        System.out.println("in writeValue");
-        //pw.println(Messages.getMappingCount( value != null ? 1 : 0 ));
-        //pw.println(Messages.formatKeyValuePair( key, value.getName() ));
-
-        pw.flush();
-
-        response.setStatus( HttpServletResponse.SC_OK );
-    }
-
-    private void writeAllMappings( HttpServletResponse response ) throws IOException
-    {
-        PrintWriter pw = response.getWriter();
-        pw.println(Messages.getMappingCount( airlineMap.size() ));
-
-        for (Map.Entry<String, Airline> entry : this.airlineMap.entrySet()) {
-            pw.println(Messages.formatKeyValuePair(entry.getKey(), entry.getValue().getFlights().toString()));
-        }
-
-        pw.flush();
-
-        response.setStatus( HttpServletResponse.SC_OK );
-    }
-*/
 
     private String getParameter(String name, HttpServletRequest request) {
-      String value = request.getParameter(name);
-      if (value == null || "".equals(value)) {
-        return null;
+        String value = request.getParameter(name);
+        if (value == null || "".equals(value)) {
+            return null;
+        }
+        else {
+            return value;
+        }
+    }
 
-      } else {
-        return value;
-      }
+    private void prettySearch(Airline airline, String s, String d, HttpServletResponse response) throws IOException {
+
+        Collection<Flight> Flights;
+        Flights = airline.getFlights();
+
+        PrintWriter printWriter = response.getWriter();
+        boolean found = false;
+
+        if (Flights.isEmpty())
+            throw new IOException("Flight List is Empty");
+
+        printWriter.write("Airline " + airline.toString() + "\n");
+
+        for (Flight flight: Flights) {
+            if (flight.getSource().compareToIgnoreCase(s) == 0 && flight.getDestination().compareToIgnoreCase(d) == 0) {
+                printWriter.write("Flight " + flight.getNumber());
+                printWriter.write(" Departs " + flight.getSrcCode());
+                printWriter.write(" at " + flight.getDeparture());
+                printWriter.write(" Arrives " + flight.getDestCode());
+                printWriter.write(" at " + flight.getArrival() + " Duration " + flight.getDuration() + " minutes\n");
+                found = true;
+            }
+        }
+        if (!found) {
+            printWriter.write("There are no flights that originate at \'" + s + "\' airport and terminate at \'" + d + "\'");
+        }
+
+        response.setStatus(HttpServletResponse.SC_OK);
+
     }
 
     private void prettyPrint(AbstractAirline airline, HttpServletResponse response) {
@@ -207,23 +208,21 @@ public class AirlineServlet extends HttpServlet
             if (flightList == null)
                 throw new AssertionError("Empty Airline List");
 
-            writer.write("Airline: " + airline.toString());
-            writer.write("\n");
+            writer.write("\nAirline " + airline.toString() + "\n");
 
             // 432 Portland OR, Sat Dec 27, 2010 1:22 PST LAX etc
             for (AbstractFlight flight : flightList) {
                 writer.write("Flight " + flight.getNumber());
                 writer.write(" Departs " + ((Flight) flight).getSrcCode());
-                writer.write(" at " + flight.getDepartureString());
+                writer.write(" at " + flight.getDeparture());
                 writer.write(" Arrives " + ((Flight) flight).getDestCode());
-                writer.write(" at " + flight.getArrival() + " Duration " + ((Flight) flight).getDuration() + "\n");
+                writer.write(" at " + flight.getArrival() + " Duration " + ((Flight) flight).getDuration() + " minutes\n");
             }
-
             writer.flush();
-
+            response.setStatus(HttpServletResponse.SC_OK);
 
         } catch (IOException ex) {
-            System.err.println("File Write Error");
+            System.err.println("ERROR: Invalid Response");
 
         }
     }

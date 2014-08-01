@@ -381,19 +381,11 @@ public class Project4 {
             portString = args[3];
 
             i = 4;
-            // if there is search flag
-            if (hasSearchFlag) {
-                if(args[search].compareToIgnoreCase("-port") == 0 || args[search].compareToIgnoreCase("-host") == 0) {
-                    error("Error: Unknown command line argument" + USAGE);
-                }
-                i = 5;
-                System.out.println("has search flag");
-            }
+
             if (hasPrintFlag) {
                 i = 5;
                 System.out.println("print flag");
             }
-
         }
 
         if(!hasHostFlag && !hasPortFlag) {
@@ -401,22 +393,16 @@ public class Project4 {
                 i = 1;
         }
 
-
         int port;
         try {
             port = Integer.parseInt( portString );
-
         } catch (NumberFormatException ex) {
             usage("Port \"" + portString + "\" must be an integer");
             return;
         }
 
-        String name = args[i];
-        int flightNumber = validateFlightNumber(args[i + 1]);
-        String src = validateThreeLetterCode(args[i + 2]);
-        String departTime = validateDateAndTime(args[i + 3] + " " + args[i + 4] + " " + args[i + 5]);
-        String dest = validateThreeLetterCode(args[i + 6]);
-        String arriveTime = validateDateAndTime(args[i + 7] + " " + args[i + 8] + " " + args[i + 9]);
+        String name = null, src = null, departTime = null, dest = null, arriveTime = null;
+        int flightNumber = 0;
 
         AirlineRestClient client = new AirlineRestClient(hostName, port);
 
@@ -424,51 +410,42 @@ public class Project4 {
 
         HttpRequestHelper.Response response;
 
-        // create an airline and flight
-        Airline airline = new Airline(name);
-        Flight flight = new Flight(flightNumber, src, departTime, dest, arriveTime);
+        if (!hasSearchFlag) {
+            name = args[i];
+            flightNumber = validateFlightNumber(args[i + 1]);
+            src = validateThreeLetterCode(args[i + 2]);
+            departTime = validateDateAndTime(args[i + 3] + " " + args[i + 4] + " " + args[i + 5]);
+            dest = validateThreeLetterCode(args[i + 6]);
+            arriveTime = validateDateAndTime(args[i + 7] + " " + args[i + 8] + " " + args[i + 9]);
 
-        String flightString = Integer.toString(flightNumber);
+            String flightString = Integer.toString(flightNumber);
 
-        // add the flight to the airline
+            // add the flight to the airline
 //        airline.addFlight(flight);
-        try {
-            response = client.addNewFlight(name, flightString, src, departTime, dest, arriveTime);
+            try {
+                response = client.addNewFlight(name, flightString, src, departTime, dest, arriveTime);
+                System.out.println("add new flight " + response.getContent());
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            response = client.getAllKeysAndValues();
-            System.out.println("response get content: " + response.getContent());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-/*
-        try {
-            if (key == null) {
-                // Print all key/value pairs
-                response = client.getAllKeysAndValues();
-            } else if (value == null) {
-                // Print all values of key
-                response = client.getValues(key);
-
-            } else {
-                // Post the key/value pair
-                response = client.addKeyValuePair(key, value);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-            checkResponseCode(HttpURLConnection.HTTP_OK, response);
-
-        } catch ( IOException ex ) {
-            error("While contacting server: " + ex);
-            return;
         }
-*/
-        //      System.out.println(response.getContent());
+
+        // if there is search flag
+        if (hasSearchFlag) {
+            if(args[search].compareToIgnoreCase("-port") == 0 || args[search].compareToIgnoreCase("-host") == 0) {
+                error("Error: Unknown command line argument" + USAGE);
+            }
+            System.out.println(args[6] + " " + args[7]);
+            try {
+                response = client.search(args[5], args[6], args[7]);
+                System.out.println(response.getContent());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            System.out.println("has search flag");
+
+        }
 
         System.exit(0);
     }
@@ -486,6 +463,11 @@ public class Project4 {
         }
     }
 
+    /**
+     * Prints error message and exits with code 1
+     * @param message
+     *        error message to print
+     */
     private static void error(String message)
     {
         PrintStream err = System.err;
