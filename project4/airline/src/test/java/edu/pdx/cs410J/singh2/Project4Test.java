@@ -24,50 +24,51 @@ public class Project4Test extends InvokeMainTestCase {
     public void testNoCommandLineArguments() {
         MainMethodResult result = invokeMain(Project4.class);
         assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Missing command line arguments."));
+        assertThat(result.getErr(), containsString("** Not enough or too many command line arguments"));
     }
 
     @Test
     public void testReadMe() {
         MainMethodResult result = invokeMain(Project4.class, "-README");
-        assertThat(result.getExitCode(), equalTo(2));
+        assertThat(result.getExitCode(), equalTo(0));
     }
 
     @Test
     public void testMissingHostNameArg() {
         MainMethodResult result = invokeMain(Project4.class, "-host");
         assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Missing host name after -host argument"));
+        assertThat(result.getErr(), containsString("** Not enough or too many command line arguments"));
     }
 
     @Test
     public void testMissingHostNameArgWithOtherOption() {
         MainMethodResult result = invokeMain(Project4.class, "-host", "-port");
         assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Missing host name after -host argument"));
+        assertThat(result.getErr(), containsString("** Not enough or too many command line arguments"));
     }
 
     @Test
     public void testMissingPortArg() {
         MainMethodResult result = invokeMain(Project4.class, "-port");
         assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Missing port after -port argument"));
+        assertThat(result.getErr(), containsString("** Not enough or too many command line arguments"));
     }
 
     @Test
     public void testMissingPortArgWithOtherOption() {
         MainMethodResult result = invokeMain(Project4.class, "-port", "-print");
         assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Missing port after -port argument"));
+        assertThat(result.getErr(), containsString("** Not enough or too many command line arguments"));
     }
 
     @Test
     public void testInvalidPortArg() {
-        MainMethodResult result = invokeMain(Project4.class, "-port", "abc");
+        MainMethodResult result = invokeMain(Project4.class, "-host", "localhost", "-port", "abc", "name", "123", "pdx", "10/21/2013", "12:35", "pm", "sea", "10/21/2013", "1:00", "pm");
         assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Argument \"abc\": Port must be an integer"));
+        assertThat(result.getErr(), containsString("** Port \"abc\" must be an integer"));
     }
 
+/*
     @Test
     public void testSearchOptionWithZeroArgs() {
         MainMethodResult result = invokeMain(Project4.class, "-search");
@@ -103,6 +104,7 @@ public class Project4Test extends InvokeMainTestCase {
         assertThat(result.getErr(), containsString("Argument `FOO': Airport code is not valid"));
     }
 
+
     @Test
     public void testSearchOptionWithBadHost() {
         MainMethodResult result = invokeMain(Project4.class, "-host", "badHost", "-port", "8080", "-search", "airline", "PDX", "LAX");
@@ -116,71 +118,14 @@ public class Project4Test extends InvokeMainTestCase {
         assertThat(result.getExitCode(), equalTo(1));
         assertThat(result.getErr(), containsString("Connection Error with server localhost:4"));
     }
-
-    @Test
+*/
+    /*@Test
     public void testNotEnoughArgs() {
         MainMethodResult result = invokeMain(Project4.class, "name", "123", "pdx", "10/21/2013", "12:35", "pm", "sea", "10/21/2013", "1:00");
         assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Missing command line arguments."));
+        assertThat(result.getErr(), containsString("** Error: Host and Port Missing. Missing command line arguments"));
     }
-
-    @Test
-    public void testTooManyArgs() {
-        MainMethodResult result = invokeMain(Project4.class, "name", "123", "pdx", "10/21/2013", "12:35", "pm", "sea", "10/21/2013", "1:00", "pm", "foo");
-        assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Too many arguments."));
-    }
-
-    @Test
-    public void testBadFlightNumber() {
-        MainMethodResult result = invokeMain(Project4.class, "name", "NUMBER", "pdx", "10/21/2013", "12:35", "pm", "sea", "10/21/2013", "1:00", "pm");
-        assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Argument `NUMBER': Flight number must be represented as an integer number"));
-    }
-
-    @Test
-    public void testBadDepartureDate1() {
-        MainMethodResult result = invokeMain(Project4.class, "name", "123", "pdx", "10/21/20/3", "12:35", "pm", "sea", "10/21/2013", "1:00", "pm");
-        assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Argument `10/21/20/3': Date must be in the format mm/dd/yyyy and be a valid date"));
-    }
-
-    @Test
-    public void testBadDepartureDate2() {
-        MainMethodResult result = invokeMain(Project4.class, "name", "123", "pdx", "2/29/2013", "12:35", "pm", "sea", "10/21/2013", "1:00", "pm");
-        assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Argument `2/29/2013': Date must be in the format mm/dd/yyyy and be a valid date"));
-    }
-
-    @Test
-    public void testBadDepartureDate3() {
-        MainMethodResult result = invokeMain(Project4.class, "name", "123", "pdx", "2/30/201X", "12:35", "pm", "sea", "02/30/2012", "1:00", "pm");
-        assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Argument `2/30/201X': Date must be in the format mm/dd/yyyy and be a valid date"));
-    }
-
-    @Test
-    public void testBadDepartureTime1() {
-        MainMethodResult result = invokeMain(Project4.class, "name", "123", "pdx", "10/21/2013", "13:35", "pm", "sea", "10/21/2013", "1:00", "pm");
-        assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Argument `13:35': Time must be in the format hh:mm 12-hour time"));
-    }
-
-    @Test
-    public void testBadDepartureTime2() {
-        MainMethodResult result = invokeMain(Project4.class, "name", "123", "pdx", "10/21/2013", "12:XX", "pm", "sea", "10/21/2013", "1:00", "pm");
-        assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Argument `12:XX': Time must be in the format hh:mm 12-hour time"));
-    }
-
-    @Test
-    public void testBadDepartureMeridian() {
-        MainMethodResult result = invokeMain(Project4.class, "name", "123", "pdx", "10/21/2013", "12:35", "hm", "sea", "10/21/2013", "1:00", "pm");
-        assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getErr(), containsString("Argument `hm': Must be either am or pm"));
-    }
-
-    @Test
+ @Test
     public void testAddValidFlight1() {
         MainMethodResult result = invokeMain(Project4.class, "Foo Airlines", "123", "pdx", "10/21/2013", "12:35", "pm", "sea", "10/21/2013", "1:00", "pm");
         assertThat(result.getExitCode(), equalTo(0));
@@ -217,44 +162,46 @@ public class Project4Test extends InvokeMainTestCase {
         assertThat(result.getOut(), containsString("Airline \"Ghost Airlines\" not found"));
     }
 
+*/
+/*
 
+    @Test
+    public void test2EmptyServer() {
+        MainMethodResult result = invokeMain( Project4.class, HOSTNAME, PORT );
+        assertThat(result.getErr(), result.getExitCode(), equalTo(0));
+        String out = result.getOut();
+        assertThat(out, out, containsString(Messages.getMappingCount(0)));
+    }
 
-//    @Test
-//    public void test2EmptyServer() {
-//        MainMethodResult result = invokeMain( Project4.class, HOSTNAME, PORT );
-//        assertThat(result.getErr(), result.getExitCode(), equalTo(0));
-//        String out = result.getOut();
-//        assertThat(out, out, containsString(Messages.getMappingCount(0)));
-//    }
-//
-//    @Test
-//    public void test3NoValues() {
-//        String key = "KEY";
-//        MainMethodResult result = invokeMain( Project4.class, HOSTNAME, PORT, key );
-//        assertThat(result.getErr(), result.getExitCode(), equalTo(0));
-//        String out = result.getOut();
-//        assertThat(out, out, containsString(Messages.getMappingCount(0)));
-//        assertThat(out, out, containsString(Messages.formatKeyValuePair(key, null)));
-//    }
-//
-//    @Test
-//    public void test4AddValue() {
-//        String key = "KEY";
-//        String value = "VALUE";
-//
-//        MainMethodResult result = invokeMain( Project4.class, HOSTNAME, PORT, key, value );
-//        assertThat(result.getErr(), result.getExitCode(), equalTo(0));
-//        String out = result.getOut();
-//        assertThat(out, out, containsString(Messages.mappedKeyValue(key, value)));
-//
-//        result = invokeMain( Project4.class, HOSTNAME, PORT, key );
-//        out = result.getOut();
-//        assertThat(out, out, containsString(Messages.getMappingCount(1)));
-//        assertThat(out, out, containsString(Messages.formatKeyValuePair(key, value)));
-//
-//        result = invokeMain( Project4.class, HOSTNAME, PORT );
-//        out = result.getOut();
-//        assertThat(out, out, containsString(Messages.getMappingCount(1)));
-//        assertThat(out, out, containsString(Messages.formatKeyValuePair(key, value)));
-//    }
+    @Test
+    public void test3NoValues() {
+        String key = "KEY";
+        MainMethodResult result = invokeMain( Project4.class, HOSTNAME, PORT, key );
+        assertThat(result.getErr(), result.getExitCode(), equalTo(0));
+        String out = result.getOut();
+        assertThat(out, out, containsString(Messages.getMappingCount(0)));
+        assertThat(out, out, containsString(Messages.formatKeyValuePair(key, null)));
+    }
+
+    @Test
+    public void test4AddValue() {
+        String key = "KEY";
+        String value = "VALUE";
+
+        MainMethodResult result = invokeMain( Project4.class, HOSTNAME, PORT, key, value );
+        assertThat(result.getErr(), result.getExitCode(), equalTo(0));
+        String out = result.getOut();
+        assertThat(out, out, containsString(Messages.mappedKeyValue(key, value)));
+
+        result = invokeMain( Project4.class, HOSTNAME, PORT, key );
+        out = result.getOut();
+        assertThat(out, out, containsString(Messages.getMappingCount(1)));
+        assertThat(out, out, containsString(Messages.formatKeyValuePair(key, value)));
+
+        result = invokeMain( Project4.class, HOSTNAME, PORT );
+        out = result.getOut();
+        assertThat(out, out, containsString(Messages.getMappingCount(1)));
+        assertThat(out, out, containsString(Messages.formatKeyValuePair(key, value)));
+    }
+*/
 }

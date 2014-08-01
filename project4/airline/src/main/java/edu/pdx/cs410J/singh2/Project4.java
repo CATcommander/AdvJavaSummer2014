@@ -17,7 +17,7 @@ import java.util.Locale;
  */
 public class Project4 {
 
-    public static final String MISSING_ARGS = "Missing command line arguments\n";
+    public static final String MISSING_ARGS = " Missing command line arguments\n";
 
     public static final String USAGE="\nusage: java edu.pdx.cs410J.singh2.Project4 [options] <args>" +
             "\nargs are (in this order):" +
@@ -268,7 +268,7 @@ public class Project4 {
             error("Error: Unknown command line argument" + USAGE);
 
         if (!host && !port)
-            error("Error: Host and Port Missing" + MISSING_ARGS + USAGE);
+            error("Error: Host and Port Missing." + MISSING_ARGS + USAGE);
         if (host && port && search && hasPrintFlag)
             error("Error: Unknown command line argument" + USAGE);
         // only print flag is given
@@ -276,32 +276,32 @@ public class Project4 {
             error("Error: Unknown command line argument" + USAGE);
 
         if (hasPrintFlag && !host && !port && (args.length > 11 || args.length < 11))
-            error("Error: Host and Port Missing" + MISSING_ARGS + USAGE);
+            error("Error: Host and Port Missing." + MISSING_ARGS + USAGE);
 
         if (host && !port)
-            error("Error: Missing Port" + MISSING_ARGS + USAGE);
+            error("Error: Missing Port." + MISSING_ARGS + USAGE);
         if (!host && port)
-            error("Error: Missing Host" + MISSING_ARGS + USAGE);
+            error("Error: Missing Host." + MISSING_ARGS + USAGE);
 
         // only host and no port
         if (host && !port && (args.length > 12 || args.length < 12))
-            error("Error: Missing Host" + MISSING_ARGS + USAGE);
+            error("Error: Missing Host." + MISSING_ARGS + USAGE);
 
         // only port flag is given and no host
         if (port && !host && (args.length > 12 || args.length < 12))
-            error("Error: Missing Port" + MISSING_ARGS + USAGE);
+            error("Error: Missing Port." + MISSING_ARGS + USAGE);
 
         // if host, port and search is given
         if (host && port && search && !hasPrintFlag && (args.length > 8 || args.length < 8))
-            error("Error: Unknown command line argument" + USAGE);
+            error("Error: Unknown command line argument." + USAGE);
 
         // if host, port, search and print is given
         if (host && port && search && hasPrintFlag && (args.length > 8 || args.length < 8))
-            error("Error: Unknown command line argument" + USAGE);
+            error("Error: Unknown command line argument." + USAGE);
 
         // only textFile and pretty flags are given
         if (host && port && !hasPrintFlag && !search && (args.length > 14 || args.length < 14))
-            error("Error: Unknown command line argument" + USAGE);
+            error("Error: Unknown command line argument." + USAGE);
     }
 
     public static void main(String... args) throws ParserException {
@@ -321,6 +321,10 @@ public class Project4 {
         boolean hasNoFlag = false;
         boolean hasSearchFlag = false;
 
+
+        if (args == null || args.length == 0)
+            error(MISSING_ARGS + USAGE);
+
         // if command line argument contains only README
         for (String str : args) {
             if (str.compareToIgnoreCase("-README") == 0) {
@@ -329,7 +333,7 @@ public class Project4 {
         }
 
         if (args.length < 8 || args.length > 16)
-            error("Not enough or too many command line arguments");
+            error("Not enough or too many command line arguments"+ USAGE);
 
         // loop through the args to check if options exist(options can be in any order)
         for (String s : args) {
