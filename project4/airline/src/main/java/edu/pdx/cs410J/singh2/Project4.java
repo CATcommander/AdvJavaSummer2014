@@ -311,7 +311,6 @@ public class Project4 {
         int i = 0;
         int host = 0;
         int portNumber = 0;
-        int search = 0;
         int counter = 0;
 
         boolean hasREADMEFlag = false;
@@ -353,7 +352,6 @@ public class Project4 {
                 hasPortFlag = true;
             }
             else if (s.compareToIgnoreCase("-search") == 0) {
-                search = counter;
                 hasSearchFlag = true;
             }
             // if invalid flag is given, error out
@@ -384,8 +382,8 @@ public class Project4 {
                 error("Error: Unknown command line argument" + USAGE);
             }
 
-            hostName = args[1];
-            portString = args[3];
+            hostName = args[host];
+            portString = args[portNumber];
             i = 4;
 
             if (hasPrintFlag) {
@@ -435,9 +433,6 @@ public class Project4 {
 
         // if there is search flag
         if (hasSearchFlag) {
-            if(args[search].compareToIgnoreCase("-port") == 0 || args[search].compareToIgnoreCase("-host") == 0) {
-                error("Error: Unknown command line argument" + USAGE);
-            }
 
             try {
                 response = client.search(args[5], args[6], args[7]);
