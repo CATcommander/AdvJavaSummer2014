@@ -6,12 +6,12 @@
 
   <!-- Servlets -->
   <servlet>
-    <servlet-name>pingServlet</servlet-name>
+    <servlet-name>airlineServlet</servlet-name>
     <servlet-class>edu.pdx.cs410J.singh2.server.AirlineServiceImpl</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>pingServlet</servlet-name>
+    <servlet-name>airlineServlet</servlet-name>
     <url-pattern>/airline/airline</url-pattern>
   </servlet-mapping>
 
