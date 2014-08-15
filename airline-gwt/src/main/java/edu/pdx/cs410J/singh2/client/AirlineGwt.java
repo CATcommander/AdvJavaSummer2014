@@ -1,15 +1,20 @@
 package edu.pdx.cs410J.singh2.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.datepicker.client.DateBox;
+import edu.pdx.cs410J.AbstractAirline;
+import edu.pdx.cs410J.AbstractFlight;
 import edu.pdx.cs410J.AirportNames;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -30,7 +35,7 @@ public class AirlineGwt implements EntryPoint {
     private FlexTable flexTable = new FlexTable();
 
     private Button submit = new Button("Submit");
-    private Button reset = new Button("Reset");
+    private Button clear = new Button("Clear");
 
     public void onModuleLoad() {
 
@@ -169,71 +174,158 @@ public class AirlineGwt implements EntryPoint {
 
         final ListBox dropBox = new ListBox(false);
         dropBox.addItem("Add Flight");
-        dropBox.addItem("Search For Flight");
+        dropBox.addItem("Search for Flight");
 
         insidePanel.add(dropBox);
         insidePanel.setSpacing(3);
 
         rightPanel.add(insidePanel);
 
-        HorizontalPanel submitAndCancelPanel = new HorizontalPanel();
-        submitAndCancelPanel.add(submit);
-        submitAndCancelPanel.setSpacing(3);
-        submitAndCancelPanel.add(reset);
+        HorizontalPanel submitAndClearPanel = new HorizontalPanel();
+        submitAndClearPanel.add(submit);
+        submitAndClearPanel.add(clear);
+        submitAndClearPanel.setSpacing(3);
+
+        rightPanel.add(submitAndClearPanel);
+
+        dropBox.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                airlineBox.setEnabled(true);
+                departureBox.setEnabled(true);
+                arrivalBox.setEnabled(true);
+
+                if (dropBox.getItemText(dropBox.getSelectedIndex()).equalsIgnoreCase("Search for Flight")) {
+
+                    flightNumberBox.setEnabled(false);
+
+                    departureDateBox.setEnabled(false);
+                    departureDropBox.setEnabled(false);
+                    dateBox.setEnabled(false);
+
+                    arrivalDateBox.setEnabled(false);
+                    arrivalDropBox.setEnabled(false);
+                    dateBox1.setEnabled(false);
+                }
+                else {
+                    flightNumberBox.setEnabled(true);
+
+                    departureDateBox.setEnabled(true);
+                    departureDropBox.setEnabled(true);
+                    dateBox.setEnabled(true);
+
+                    arrivalDateBox.setEnabled(true);
+                    arrivalDropBox.setEnabled(true);
+                    dateBox1.setEnabled(true);
+                }
+            }
+        });
 
         submit.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
 
-                if (dropBox.getItemText(dropBox.getSelectedIndex()).equalsIgnoreCase("Add Flight")) {
-                    Window.confirm("Are you sure you want to add a flight");
-                }
-                else
-                    Window.confirm("Search");
-
-
                 String airlineName = airlineBox.getText();
-                validateAirlineName(airlineName);
-
-                int flightNumber;
-
-                try {
-                    flightNumber = Integer.parseInt(flightNumberBox.getText());
-                } catch (IllegalArgumentException e) {
-                    Window.alert(flightNumberBox.getText() + " is not a flight number");
+                if (airlineName.equalsIgnoreCase("")) {
+                    Window.alert("Please Enter Airline Name");
                     return;
                 }
+                else
+                    validateAirlineName(airlineName);
 
                 String departAirport = departureBox.getText().toUpperCase();
-                validateThreeLetterCode(departAirport);
-
-                String departDate = dateFormat.format(dateBox.getValue());
-                String departTime = departureDateBox.getText();
-                String departMarker = departureDropBox.getItemText(departureDropBox.getSelectedIndex());
-                String departFullDate = departDate + " " + departTime + " " + departMarker;
-
-                validateDateAndTime(departFullDate);
+                if (departAirport.equalsIgnoreCase("")) {
+                    Window.alert("Please Enter Departure Airport Code");
+                    return;
+                }
+                else
+                    validateThreeLetterCode(departAirport);
 
                 String arriveAirport = arrivalBox.getText().toUpperCase();
-                validateThreeLetterCode(arriveAirport);
+                if (arriveAirport.equalsIgnoreCase("")) {
+                    Window.alert("Please Enter Arrival Airport Code");
+                    return;
+                }
+                else
+                    validateThreeLetterCode(arriveAirport);
 
-                String arriveDate = dateFormat.format(dateBox1.getValue());
-                String arriveTime = arrivalDateBox.getText();
-                String arriveMarker = arrivalDropBox.getItemText(arrivalDropBox.getSelectedIndex());
-                String arriveFullDate = arriveDate + " " + arriveTime + " " + arriveMarker;
-                validateDateAndTime(arriveFullDate);
+                if (dropBox.getItemText(dropBox.getSelectedIndex()).equalsIgnoreCase("Add Flight")) {
 
-                Airline airline = new Airline(airlineName);
-                Flight flight = new Flight(flightNumber, departAirport, departFullDate, arriveAirport, arriveFullDate);
-                airline.addFlight(flight);
+                    int flightNumber=0;
+                    Window.alert(flightNumberBox.getText());
+                    if (flightNumberBox.getText().equalsIgnoreCase("")) {
+                        Window.alert("Please Enter Flight Number");
+                        return;
+                    }
+                    else {
+                        try {
+                            flightNumber = Integer.parseInt(flightNumberBox.getText());
+                        } catch (IllegalArgumentException e) {
+                            Window.alert(flightNumberBox.getText() + " is not a flight number");
+                            return;
+                        }
+                    }
 
+                    String departDate = dateFormat.format(dateBox.getValue());
+                    String departTime = departureDateBox.getText();
+                    String departMarker = departureDropBox.getItemText(departureDropBox.getSelectedIndex());
+                    String departFullDate = departDate + " " + departTime + " " + departMarker;
+
+                    validateDateAndTime(departFullDate);
+
+                    String arriveDate = dateFormat.format(dateBox1.getValue());
+                    String arriveTime = arrivalDateBox.getText();
+                    String arriveMarker = arrivalDropBox.getItemText(arrivalDropBox.getSelectedIndex());
+                    String arriveFullDate = arriveDate + " " + arriveTime + " " + arriveMarker;
+                    validateDateAndTime(arriveFullDate);
+
+                    final Airline airline = new Airline(airlineName);
+                    final Flight flight = new Flight(flightNumber, departAirport, departFullDate, arriveAirport, arriveFullDate);
+                    airline.addFlight(flight);
+
+
+                    AirlineServiceAsync async = GWT.create(AirlineService.class);
+                    async.addFlight(airline, new AsyncCallback<ArrayList<AbstractAirline>>() {
+                        @Override
+                        public void onFailure(Throwable caught) {
+                            Window.alert(caught.getMessage());
+                        }
+
+                        @Override
+                        public void onSuccess(ArrayList<AbstractAirline> result) {
+                            StringBuilder sb = new StringBuilder();
+
+                            for ( AbstractAirline flight : result) {
+                                sb.append(flight);
+                                sb.append("\n");
+                            }
+                            System.out.println(sb.toString());
+                            Window.alert( sb.toString() );
+                            Window.alert( airline.toString());
+                        }
+                    });
+                }
+                else
+                {
+
+                }
             }
         });
 
-        rightPanel.add(submitAndCancelPanel);
+        clear.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                airlineBox.setText("");
+                flightNumberBox.setText("");
+                departureBox.setText("");
+                departureDateBox.setText("");
+                departureDropBox.setEnabled(true);
+                arrivalBox.setText("");
+                arrivalDateBox.setText("");
+                arrivalDropBox.setEnabled(true);
+            }
 
-        //mainPanel.add(flexTable) ;
-        //mainPanel.add(rightPanel);
+        });
 
         dockPanel.add(new HTML("CS410J Airline Database"), DockPanel.NORTH);
         dockPanel.add(menu, DockPanel.NORTH);
@@ -241,40 +333,8 @@ public class AirlineGwt implements EntryPoint {
         dockPanel.add(flexTable, DockPanel.WEST);
         dockPanel.add(rightPanel, DockPanel.EAST);
 
-
         RootPanel.get().add(dockPanel);
 
-/*        // example in class
-
-        Button button = new Button("Check the flights");
-        button.addClickHandler(new ClickHandler() {
-            public void onClick( ClickEvent clickEvent )
-            {
-                AirlineServiceAsync async = GWT.create( AirlineService.class );
-                async.airline( new AsyncCallback<AbstractAirline>() {
-
-                    public void onFailure( Throwable ex )
-                    {
-                        Window.alert(ex.toString());
-                    }
-
-                    public void onSuccess( AbstractAirline airline )
-                    {
-                        StringBuilder sb = new StringBuilder( airline.toString() );
-                        Collection<AbstractFlight> flights = airline.getFlights();
-                        int size = airline.getName().length();
-                        for ( AbstractFlight flight : flights ) {
-                            sb.append(flight);
-                            sb.insert(15 + size, "\n");
-                            sb.append("\n");
-                        }
-                        System.out.println(sb.toString());
-                        Window.alert( sb.toString() );
-                    }
-                });
-            }
-        });
-        */
     }
 
     private TextBox makeTextBoxWithLabel(String placeholder) {
@@ -313,13 +373,18 @@ public class AirlineGwt implements EntryPoint {
      */
     public void validateDateAndTime(String args) {
         DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm a");
+        String [] dateAndTime = args.split(" ");
 
         try {
             dateTimeFormat.parseStrict(args);
         } catch (IllegalArgumentException e) {
-            Window.alert("Error: Invalid Date & Time. Must be in mm/dd/yyyy hh:mm am/pm format");
+            Window.alert("Invalid Date & Time. Must be in mm/dd/yyyy hh:mm am/pm format");
             return;
         }
+
+        validateDate(dateAndTime[0]);
+        validateTime(dateAndTime[1]);
+        validateDay(dateAndTime[2]);
     }
 
     /**
@@ -334,7 +399,7 @@ public class AirlineGwt implements EntryPoint {
     public void validateAirlineName(String arg) {
         for (char c: arg.toCharArray()) {
             if (!Character.isLetter(c)) {
-                Window.alert("bad name");
+                Window.alert("Invalid Airline Name");
                 return;
             }
         }
@@ -351,14 +416,96 @@ public class AirlineGwt implements EntryPoint {
     private void validateThreeLetterCode(String arg) {
         for (char c: arg.toCharArray()) {
             if (arg.length() != 3 || Character.isDigit(c)) {
-                Window.alert("Error: Invalid Three-Letter Code");
+                Window.alert("Invalid Three-Letter Code");
                 return;
             }
         }
         String validCode = AirportNames.getName(arg.toUpperCase());
         if (validCode == null) {
-            Window.alert("Error: Airport code \'" + arg + "\' does not exist");
+            Window.alert("Airport code \'" + arg + "\' does not exist");
             return;
+        }
+    }
+
+    /**
+     * Validate the date so the date format is mm/dd/yyyy
+     * if <code>args</code> is invalid, the program exits
+     * @param args
+     * the date of departure/arrival
+     * @return date
+     * returns the valid date in correct format (mm/dd/yyyy)
+     */
+    private void validateDate(String args) {
+        for (char c: args.toCharArray()) {
+            if (Character.isLetter(c)) {
+                Window.alert("Invalid Date. Can not contain characters or symbols");
+                return;
+            }
+        }
+
+        String date[] = args.split("/");
+        int month, day, year;
+        try {
+            month = Integer.parseInt(date[0]);
+            day = Integer.parseInt(date[1]);
+            year = Integer.parseInt(date[2]);
+        } catch (NumberFormatException ex) {
+            Window.alert("Invalid Date");
+            return;
+        }
+        if (month < 1 || month > 12) {
+            Window.alert("Invalid Month");
+            return;
+        }
+        if (day < 1 || day > 31) {
+            Window.alert("Invalid Day");
+            return;
+        }
+        /* year is 9999 assuming humanity or earth survives that long */
+        if (year < 1800 || year > 9999) {
+            Window.alert("Invalid Year");
+            return;
+        }
+    }
+
+    /**
+     * Validates the time format. if <code>args</code> is not
+     * valid time, program exits
+     * @param args
+     * the time in 24-hour format (string to parse)
+     */
+    private void validateTime(String args) {
+        for (char c: args.toCharArray()) {
+            if (Character.isLetter(c)) {
+                Window.alert("Invalid Time. Can not contain characters or symbols");
+                return;
+            }
+        }
+        String time[] = args.split(":");
+        int hour = 0, minute = 0;
+        try {
+            hour = Integer.parseInt(time[0]);
+            minute = Integer.parseInt(time[1]);
+        } catch (NumberFormatException ex) {
+            Window.alert("Error: Invalid Time");
+            return;
+        }
+        /* check if time is in 24-hour format */
+        if (hour > 12 || hour < 1) {
+            Window.alert("Error: Invalid Hour");
+            return;
+        }
+        if (minute > 59 || minute < 0) {
+            Window.alert("Invalid Minute(s)");
+            return;
+        }
+    }
+    private static void validateDay(String arg) {
+        for (char c: arg.toCharArray()) {
+            if (arg.length() != 2 || Character.isDigit(c)) {
+                Window.alert("Invalid am/pm marker");
+                return;
+            }
         }
     }
 }
