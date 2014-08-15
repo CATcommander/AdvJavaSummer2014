@@ -73,8 +73,9 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * returns validated DateFormat Arrival string
      */
     public String getDepartureString() {
-        return DateTimeFormat.getShortDateTimeFormat().format(this.getDeparture());
-        //return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(this.getDeparture());
+        DateTimeFormat format = DateTimeFormat.getFormat("EEE, MMM d, yyyy h:mm a");
+
+        return format.format(this.getDeparture());
     }
     /**
      * Just returns the name of flight's departure airport
@@ -118,8 +119,8 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
         //return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(this.getDeparture());
     }
     /**
-     * returns three letter code
-     * @return returns three letter code
+     * returns full airport code
+     * @return returns full airport code
      */
     public String getDestCode() {
         String airportName = AirportNames.getName(this.destination.toUpperCase());
@@ -146,8 +147,9 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * returns validated DateFormat Arrival string
      */
     public String getArrivalString() {
-        return DateTimeFormat.getShortDateTimeFormat().format(this.getArrival());
-        //return DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(this.getArrival());
+        DateTimeFormat format = DateTimeFormat.getFormat("EEE, MMM d, yyyy h:mm a");
+
+        return format.format(this.getArrival());
     }
     /**
      * returns Date Format LONG String

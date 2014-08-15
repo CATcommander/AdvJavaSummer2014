@@ -14,6 +14,7 @@ import java.util.ArrayList;
 @RemoteServiceRelativePath("airline")
 public interface AirlineService extends RemoteService {
 
+    public ArrayList<AbstractAirline> displayAll();
     public ArrayList<AbstractAirline> addFlight(AbstractAirline airline);
     public Airline search(String airlineName, String src, String dest);
 }

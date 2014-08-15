@@ -28,6 +28,13 @@ public class AirlineServiceImpl extends RemoteServiceServlet implements AirlineS
     }
 
     @Override
+    public ArrayList<AbstractAirline> displayAll() {
+        if (!airlineDatabase.isEmpty())
+            return airlineDatabase;
+        return airlineDatabase;
+    }
+
+    @Override
     public ArrayList<AbstractAirline> addFlight(AbstractAirline airline) {
 
         boolean airlineExists = false;
@@ -55,26 +62,58 @@ public class AirlineServiceImpl extends RemoteServiceServlet implements AirlineS
 
     @Override
     public Airline search(String airlineName, String src, String dest) {
-        AbstractAirline airline = new Airline();
+        AbstractAirline airline = new Airline(airlineName);
 
-        if (airlineName != null) {
+        airline = airlineDatabase.get(0);
+
+        for (Object f: airline.getFlights()) {
+            if (((Flight) f).getSource().equalsIgnoreCase(src) &&
+                    ((Flight) f).getDestination().equalsIgnoreCase(dest)) {
+                airline.addFlight(((Flight) f));
+                return ((Airline) airline);
+            }
+        }
+/*
+        for (AbstractAirline air: airlineDatabase) {
+
+            if (air.getName().equalsIgnoreCase(airline.getName())) {
+                for (Object f: air.getFlights()) {
+                    if (((Flight) f).getSource().equalsIgnoreCase(src) &&
+                            ((Flight) f).getDestination().equalsIgnoreCase(dest)) {
+                        airline.addFlight(((Flight) f));
+                        return ((Airline) airline);
+                    }
+                }
+            }
+        }*/
+
+
+        return ((Airline) airline);
+
+        /*if (airlineDatabase.get(airlineName) != null) {
             // if airline exists
             if (airlineDatabase.contains(airlineName)) {
                 // for each airline in airlineDatabase
-                for (AbstractAirline abstractAirline: airlineDatabase) {
-                    if (abstractAirline.getName().equalsIgnoreCase(airlineName)) {
-                        for (Object flight: abstractAirline.getFlights()){
-                            if( ((AbstractFlight) flight).getSource().equals(src) &&
-                                    ((AbstractFlight) flight).getDestination().equals(dest)) {
-                                    airline.addFlight(((AbstractFlight) flight));
+                for (AbstractAirline abstractAirline: airlineDatabase)
+                {
+                    if (abstractAirline.getName().equalsIgnoreCase(airlineName))
+                    {
+                        for (Object flight: abstractAirline.getFlights())
+                        {
+                            if( ((AbstractFlight) flight).getSource().equalsIgnoreCase(src) &&
+                                    ((AbstractFlight) flight).getDestination().equalsIgnoreCase(dest))
+                            {
+                                Window.alert("in search" + src + dest);
+                                airline.addFlight(((AbstractFlight) flight));
+                                Window.alert(prettySearch(((Airline) airline), src, dest));
                             }
                         }
                     }
                 }
             }
-        }
-
-        return ((Airline) airline);
+            else
+                return null;
+        }*/
     }
 
     private String prettySearch(Airline airline, String s, String d)
