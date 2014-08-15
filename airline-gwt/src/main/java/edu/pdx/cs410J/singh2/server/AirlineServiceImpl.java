@@ -8,7 +8,7 @@ import edu.pdx.cs410J.singh2.client.AirlineService;
 import edu.pdx.cs410J.singh2.client.Flight;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+
 
 /**
  * The server-side implementation of the Airline service
@@ -48,7 +48,7 @@ public class AirlineServiceImpl extends RemoteServiceServlet implements AirlineS
         if (!airlineExists)
             airlineDatabase.add(airline);
 
-        return  airlineDatabase;
+        return airlineDatabase;
     }
 
     @Override

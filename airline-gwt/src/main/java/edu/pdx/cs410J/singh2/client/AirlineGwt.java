@@ -1,10 +1,17 @@
 package edu.pdx.cs410J.singh2.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.*;
-import com.google.gwt.user.client.ui.FlexTable.FlexCellFormatter;
+import com.google.gwt.user.datepicker.client.DateBox;
+import edu.pdx.cs410J.AirportNames;
+
+import java.util.Date;
+
 
 /**
  * A basic GWT class that makes sure that we can send an airline back from the server
@@ -23,9 +30,7 @@ public class AirlineGwt implements EntryPoint {
     private FlexTable flexTable = new FlexTable();
 
     private Button submit = new Button("Submit");
-    private Button cancel = new Button("Cancel");
-    private RadioButton addFlightRadioButton;
-    private RadioButton searchRadioButton;
+    private Button reset = new Button("Reset");
 
     public void onModuleLoad() {
 
@@ -41,7 +46,7 @@ public class AirlineGwt implements EntryPoint {
         // Create a menu bar
         MenuBar menu = new MenuBar();
         menu.setAutoOpen(true);
-        menu.setWidth("800px");
+        menu.setWidth("1200px");
         menu.setAnimationEnabled(true);
 
         MenuBar helpMenu = new MenuBar(true);
@@ -53,51 +58,193 @@ public class AirlineGwt implements EntryPoint {
 
         mainPanel.add(menu);
 
-        FlexCellFormatter cellFormatter = flexTable.getFlexCellFormatter();
-        flexTable.setWidth("32em");
-        flexTable.setCellSpacing(5);
-        flexTable.setCellPadding(3);
+        flexTable.setWidth("50em");
+        flexTable.setCellSpacing(4);
+        flexTable.setCellPadding(10);
 
         mainPanel.setBorderWidth(1);
+        mainPanel.setSpacing(3);
 
-        rightPanel.setBorderWidth(1);
         rightPanel.setSpacing(2);
 
+        VerticalPanel panel1 = new VerticalPanel();
+        VerticalPanel panel2 = new VerticalPanel();
+        VerticalPanel panel3 = new VerticalPanel();
 
-        insideTextBoxPanel();
+        panel1.setSpacing(2);
+        panel2.setSpacing(2);
+        panel3.setSpacing(3);
 
-        addFlightRadioButton = new RadioButton("Add a Flight", "Add a Flight");
-        searchRadioButton = new RadioButton("Search for flight(s)", "Search for flight(s)");
+        final TextBox airlineBox = makeTextBoxWithLabel("Delta Airlines");
+        airlineBox.setMaxLength(25);
+        airlineBox.setVisibleLength(25);
 
+        final TextBox flightNumberBox = makeTextBoxWithLabel("432");
+        flightNumberBox.setMaxLength(6);
+        flightNumberBox.setVisibleLength(6);
 
-        rightPanel.add(addFlightRadioButton);
-        rightPanel.add(searchRadioButton);
+        final TextBox departureBox = makeTextBoxWithLabel("PDX");
+        departureBox.setMaxLength(3);
+        departureBox.setVisibleLength(3);
+
+        final TextBox arrivalBox = makeTextBoxWithLabel("LAX");
+        arrivalBox.setMaxLength(3);
+        arrivalBox.setVisibleLength(3);
+
+        panel1.add(new Label("Airline"));
+        panel1.add(airlineBox);
+
+        panel1.add(new Label("Flight Number"));
+        panel2.add(flightNumberBox);
+
+        panel2.add(new Label("Departure Airport"));
+        panel2.add(departureBox);
+
+        panel2.add(new Label(" Departure Date & Time"));
+
+        HorizontalPanel hp = new HorizontalPanel();
+        final TextBox departureDateBox = new TextBox();
+
+        departureDateBox.getElement().setAttribute("placeholder", "hh:mm");
+        departureDateBox.setFocus(true);
+        departureDateBox.setMaxLength(5);
+        departureDateBox.setVisibleLength(5);
+
+        hp.setSpacing(4);
+
+        final DateTimeFormat dateFormat = DateTimeFormat.getFormat("MM/dd/yyyy");
+
+        final DateBox dateBox = new DateBox();
+        dateBox.setFormat(new DateBox.DefaultFormat(dateFormat));
+        dateBox.getDatePicker().setYearArrowsVisible(true);
+        dateBox.getElement().setAttribute("placeholder", "Select Date");
+
+        hp.add(dateBox);
+        hp.add(departureDateBox);
+
+        final ListBox departureDropBox = new ListBox(false);
+
+        departureDropBox.addItem("am");
+        departureDropBox.addItem("pm");
+
+        hp.add(departureDropBox);
+
+        panel2.add(hp);
+
+        rightPanel.add(panel1);
+        rightPanel.add(panel2);
+
+        panel3.add(new Label("Arrival Airport"));
+        panel3.add(arrivalBox);
+
+        panel3.add(new Label(" Arrival Date & Time"));
+
+        HorizontalPanel hp1 = new HorizontalPanel();
+        final TextBox arrivalDateBox = new TextBox();
+
+        arrivalDateBox.getElement().setAttribute("placeholder", "hh:mm");
+        arrivalDateBox.setFocus(true);
+        arrivalDateBox.setMaxLength(5);
+        arrivalDateBox.setVisibleLength(5);
+
+        hp1.setSpacing(4);
+
+        final DateBox dateBox1 = new DateBox();
+        dateBox1.setFormat(new DateBox.DefaultFormat(dateFormat));
+        dateBox1.getDatePicker().setYearArrowsVisible(true);
+        dateBox1.getElement().setAttribute("placeholder", "Select Date");
+
+        hp1.add(dateBox1);
+        hp1.add(arrivalDateBox);
+
+        final ListBox arrivalDropBox = new ListBox(false);
+
+        arrivalDropBox.addItem("am");
+        arrivalDropBox.addItem("pm");
+
+        hp1.add(arrivalDropBox);
+        panel3.add(hp1);
+
+        rightPanel.add(panel3);
+
+        final ListBox dropBox = new ListBox(false);
+        dropBox.addItem("Add Flight");
+        dropBox.addItem("Search For Flight");
+
+        insidePanel.add(dropBox);
+        insidePanel.setSpacing(3);
+
+        rightPanel.add(insidePanel);
 
         HorizontalPanel submitAndCancelPanel = new HorizontalPanel();
         submitAndCancelPanel.add(submit);
         submitAndCancelPanel.setSpacing(3);
-        submitAndCancelPanel.add(cancel);
+        submitAndCancelPanel.add(reset);
+
+        submit.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+
+                if (dropBox.getItemText(dropBox.getSelectedIndex()).equalsIgnoreCase("Add Flight")) {
+                    Window.confirm("Are you sure you want to add a flight");
+                }
+                else
+                    Window.confirm("Search");
+
+
+                String airlineName = airlineBox.getText();
+                validateAirlineName(airlineName);
+
+                int flightNumber;
+
+                try {
+                    flightNumber = Integer.parseInt(flightNumberBox.getText());
+                } catch (IllegalArgumentException e) {
+                    Window.alert(flightNumberBox.getText() + " is not a flight number");
+                    return;
+                }
+
+                String departAirport = departureBox.getText().toUpperCase();
+                validateThreeLetterCode(departAirport);
+
+                String departDate = dateFormat.format(dateBox.getValue());
+                String departTime = departureDateBox.getText();
+                String departMarker = departureDropBox.getItemText(departureDropBox.getSelectedIndex());
+                String departFullDate = departDate + " " + departTime + " " + departMarker;
+
+                validateDateAndTime(departFullDate);
+
+                String arriveAirport = arrivalBox.getText().toUpperCase();
+                validateThreeLetterCode(arriveAirport);
+
+                String arriveDate = dateFormat.format(dateBox1.getValue());
+                String arriveTime = arrivalDateBox.getText();
+                String arriveMarker = arrivalDropBox.getItemText(arrivalDropBox.getSelectedIndex());
+                String arriveFullDate = arriveDate + " " + arriveTime + " " + arriveMarker;
+                validateDateAndTime(arriveFullDate);
+
+                Airline airline = new Airline(airlineName);
+                Flight flight = new Flight(flightNumber, departAirport, departFullDate, arriveAirport, arriveFullDate);
+                airline.addFlight(flight);
+
+            }
+        });
 
         rightPanel.add(submitAndCancelPanel);
 
-        mainPanel.add(flexTable) ;
-        mainPanel.add(rightPanel);
+        //mainPanel.add(flexTable) ;
+        //mainPanel.add(rightPanel);
 
-        dockPanel.add(new HTML("CS410J Airline Database"), dockPanel.NORTH);
-        dockPanel.add(menu, dockPanel.NORTH);
+        dockPanel.add(new HTML("CS410J Airline Database"), DockPanel.NORTH);
+        dockPanel.add(menu, DockPanel.NORTH);
 
-        dockPanel.add(mainPanel, dockPanel.WEST);
-        dockPanel.add(rightPanel, dockPanel.EAST);
+        dockPanel.add(flexTable, DockPanel.WEST);
+        dockPanel.add(rightPanel, DockPanel.EAST);
+
 
         RootPanel.get().add(dockPanel);
 
-
 /*        // example in class
-        TextBox textBox = new TextBox();
-        textBox.getElement().setAttribute("placeholder", "PDX");
-
-        // Airline airline;
-        // if (airline)
 
         Button button = new Button("Check the flights");
         button.addClickHandler(new ClickHandler() {
@@ -130,57 +277,17 @@ public class AirlineGwt implements EntryPoint {
         */
     }
 
-    private void insideTextBoxPanel() {
-        TextBox airlineBox = new TextBox();
-        airlineBox.setFocus(true);
-        airlineBox.getElement().setAttribute("placeholder", "Delta Airlines");
-        Label airlineBoxLabel = new Label("Airline");
-        airlineBoxLabel.setVisible(true);
+    private TextBox makeTextBoxWithLabel(String placeholder) {
+        TextBox textBox = new TextBox();
+        VerticalPanel panel = new VerticalPanel();
 
-        insidePanel.add(airlineBoxLabel);
-        insidePanel.add(airlineBox);
+        panel.setSpacing(3);
+        textBox.getElement().setAttribute("placeholder", placeholder);
+        textBox.setFocus(true);
 
-        TextBox flightNumberBox = new TextBox();
-        flightNumberBox.getElement().setAttribute("placeholder", "423");
-        Label flightNumberLabel = new Label("Flight Number");
-        flightNumberBox.setFocus(true);
+        panel.add(textBox);
 
-        insidePanel.add(flightNumberLabel);
-        insidePanel.add(flightNumberBox);
-
-        TextBox departureBox = new TextBox();
-        departureBox.getElement().setAttribute("placeholder", "PDX");
-        Label departureLabel = new Label("Departure");
-        departureBox.setFocus(true);
-
-        insidePanel.add(departureLabel);
-        insidePanel.add(departureBox);
-
-        TextBox departureDateBox = new TextBox();
-        departureDateBox.getElement().setAttribute("placeholder", "mm/dd/yyyy");
-        Label departureDateLabel = new Label("Departure Date");
-        departureDateBox.setFocus(true);
-
-        insidePanel.add(departureDateLabel);
-        insidePanel.add(departureDateBox);
-
-        TextBox arrivalBox = new TextBox();
-        arrivalBox.getElement().setAttribute("placeholder", "LAX");
-        Label arrivalLabel = new Label("Arrive");
-        arrivalBox.setFocus(true);
-
-        insidePanel.add(arrivalLabel);
-        insidePanel.add(arrivalBox);
-
-        TextBox arrivalDateBox = new TextBox();
-        arrivalDateBox.getElement().setAttribute("placeholder", "mm/dd/yyyy");
-        Label arrivalDateLabel = new Label("Arrival Date");
-        arrivalDateBox.setFocus(true);
-
-        insidePanel.add(arrivalDateLabel);
-        insidePanel.add(arrivalDateBox);
-
-        rightPanel.add(insidePanel);
+        return textBox;
     }
 
     private void setAirlineHeader(FlexTable flexTable) {
@@ -195,5 +302,63 @@ public class AirlineGwt implements EntryPoint {
         flexTable.setText(0, 3, "Date & Time");
         flexTable.setText(0, 4, "Arrival");
         flexTable.setText(0, 5, "Date & Time");
+    }
+
+    /**
+     * Validates the Date, time and am/pm marker
+     * @param args
+     * date and time string
+     * @return
+     * validated date and time
+     */
+    public void validateDateAndTime(String args) {
+        DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm a");
+
+        try {
+            dateTimeFormat.parseStrict(args);
+        } catch (IllegalArgumentException e) {
+            Window.alert("Error: Invalid Date & Time. Must be in mm/dd/yyyy hh:mm am/pm format");
+            return;
+        }
+    }
+
+    /**
+     * This function validates if flightNumber is valid integer. If flight number is not a valid integer,
+     * the program exits with a user-friendly error message.
+     *
+     * @param arg
+     * string to parse
+     * @return flightNumber
+     * parsed value of integer
+     */
+    public void validateAirlineName(String arg) {
+        for (char c: arg.toCharArray()) {
+            if (!Character.isLetter(c)) {
+                Window.alert("bad name");
+                return;
+            }
+        }
+    }
+
+    /**
+     * validates three letter code is characters only. If it contains
+     * anything except characters, the program will exit
+     * @param arg
+     * the string to parse with three letter code
+     * @return
+     * validated parsed three letter code in upper case
+     */
+    private void validateThreeLetterCode(String arg) {
+        for (char c: arg.toCharArray()) {
+            if (arg.length() != 3 || Character.isDigit(c)) {
+                Window.alert("Error: Invalid Three-Letter Code");
+                return;
+            }
+        }
+        String validCode = AirportNames.getName(arg.toUpperCase());
+        if (validCode == null) {
+            Window.alert("Error: Airport code \'" + arg + "\' does not exist");
+            return;
+        }
     }
 }

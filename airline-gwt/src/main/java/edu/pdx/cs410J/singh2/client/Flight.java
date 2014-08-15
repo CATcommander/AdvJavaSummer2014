@@ -4,10 +4,9 @@ import edu.pdx.cs410J.AbstractFlight;
 import edu.pdx.cs410J.AirportNames;
 
 import java.util.Date;
-import java.text.ParseException;
+
 import com.google.gwt.i18n.client.DateTimeFormat;
 
-import java.util.Date;
 
 /**
  * This class has information about a Flight which extends
@@ -183,6 +182,7 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
         int SMALLER = -1;
         int SAME = 0;
         int GREATER = 1;
+
         if (this.source.compareTo(flight.getSource()) == 1) {
             return GREATER;
         }
