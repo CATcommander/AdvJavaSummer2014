@@ -15,6 +15,6 @@ import java.util.ArrayList;
 public interface AirlineService extends RemoteService {
 
     public ArrayList<AbstractAirline> displayAll();
-    public ArrayList<AbstractAirline> addFlight(AbstractAirline airline);
     public Airline search(String airlineName, String src, String dest);
+    ArrayList<AbstractAirline> addFlight(AbstractAirline abstractAirline, AbstractFlight flight);
 }

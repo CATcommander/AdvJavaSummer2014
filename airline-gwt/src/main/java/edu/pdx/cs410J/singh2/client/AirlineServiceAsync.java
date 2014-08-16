@@ -11,8 +11,10 @@ import java.util.ArrayList;
  */
 public interface AirlineServiceAsync {
 
-    void addFlight(AbstractAirline abstractAirline, AsyncCallback<ArrayList<AbstractAirline>> asyncCallback);
+    void addFlight(AbstractAirline abstractAirline, AbstractFlight flight, AsyncCallback<ArrayList<AbstractAirline>> asyncCallback);
     void search(String airlineName, String src, String dest, AsyncCallback<Airline> async);
 
     void displayAll(AsyncCallback<ArrayList<AbstractAirline>> async);
+
+   // void search(String airlineName, String src, String dest, AsyncCallback<String> async);
 }

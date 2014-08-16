@@ -1,0 +1,44 @@
+.table{
+    border: 2px solid gray;
+    background-color: lightyellow;
+}
+
+.label {
+    color: tomato;
+    font-family: sans-serif;
+    font-weight: bold;
+
+}
+
+
+.gwt-horizontalPanel {
+    background-color: lime;
+}
+
+.textBox {
+    background-color: white;
+    border: 1px solid orange;
+}
+
+.greenButton {
+    background-color: green;
+    font-family: sans-serif;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.redButton {
+    background-color: red;
+    color: white;
+    font-weight: bold;
+    font-family: sans-serif;
+    text-transform: uppercase;
+}
+
+.yellowButton {
+    background-color: yellow;
+    font-weight: bold;
+    font-family: sans-serif;
+    text-transform: uppercase;
+}

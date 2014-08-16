@@ -73,7 +73,7 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * returns validated DateFormat Arrival string
      */
     public String getDepartureString() {
-        DateTimeFormat format = DateTimeFormat.getFormat("EEE, MMM d, yyyy h:mm a");
+        DateTimeFormat format = DateTimeFormat.getFormat("MM/dd/yyyy h:mm a");
 
         return format.format(this.getDeparture());
     }
@@ -114,9 +114,10 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * returns the Date with LONG format into a String
      * @return Date Format LONG String
      */
-    public String getDepartLONG() {
-        return DateTimeFormat.getLongDateTimeFormat().format(this.getDeparture());
-        //return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(this.getDeparture());
+    public String getDepartNice() {
+        DateTimeFormat format = DateTimeFormat.getFormat("EEE, MMM d, yyyy h:mm a");
+
+        return format.format(this.getDeparture());
     }
     /**
      * returns full airport code
@@ -147,7 +148,7 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * returns validated DateFormat Arrival string
      */
     public String getArrivalString() {
-        DateTimeFormat format = DateTimeFormat.getFormat("EEE, MMM d, yyyy h:mm a");
+        DateTimeFormat format = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm a");
 
         return format.format(this.getArrival());
     }
@@ -155,9 +156,9 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * returns Date Format LONG String
      * @return Date Format LONG String
      */
-    public String getArrivalLONG() {
-        return DateTimeFormat.getLongDateTimeFormat().format(this.getArrival());
-        //return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.LONG).format(this.getArrival());
+    public String getArrivalNice() {
+        DateTimeFormat format = DateTimeFormat.getFormat("EEE, MMM d, yyyy h:mm a");
+        return format.format(this.getArrival());
     }
     /**
      * get duration in minutes

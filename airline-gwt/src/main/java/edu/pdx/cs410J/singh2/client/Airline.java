@@ -43,7 +43,7 @@ public class Airline extends AbstractAirline {
      * @return listOfFlight
      * list of flights
      */
-    public ArrayList<Flight> getFlights() {
+    public Collection<Flight> getFlights() {
         return listOfFlights;
     }
     /**
