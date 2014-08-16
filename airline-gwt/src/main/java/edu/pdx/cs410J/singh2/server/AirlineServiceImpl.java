@@ -11,122 +11,94 @@ import edu.pdx.cs410J.singh2.client.Flight;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Map;
-
 
 /**
  * The server-side implementation of the Airline service
  */
 public class AirlineServiceImpl extends RemoteServiceServlet implements AirlineService
 {
-    // have a hashmap of airlines here to store all the airlines
-    //ArrayList<AbstractAirline> airlineDatabase = new ArrayList<>();
-    HashMap<String, AbstractAirline> airlineDatabase = new HashMap<>();
+    static final HashMap<String, Airline> airlineDatabase = new HashMap<>();
 
-    public AbstractAirline airline()
-    {
-        Airline airline = new Airline();
-        airline.addFlight( new Flight() );
-        return airline;
-    }
-
+    /**
+     * display all the flights to the user
+     * @return return a list of airline with flights added
+     */
     @Override
-    public ArrayList<AbstractAirline> displayAll() {
-        ArrayList<AbstractAirline> abstractAirlines = new ArrayList<>();
+    public ArrayList<Airline> displayAll() {
+        ArrayList<Airline> abstractAirlines = new ArrayList<>();
+        abstractAirlines.addAll(airlineDatabase.values());
 
-        if (!airlineDatabase.isEmpty()) {
-            for (Map.Entry<String, AbstractAirline> airlineEntry: airlineDatabase.entrySet()) {
-                abstractAirlines.add(airlineEntry.getValue());
-            }
-        }
         return abstractAirlines;
     }
 
+    /**
+     * add a flight with airline name and flight
+     * @param airlineName name of the airline
+     * @param flight  flight to add
+     * @return returns the list of airline and flights
+     */
     @Override
-    public ArrayList<AbstractAirline> addFlight(AbstractAirline airline, AbstractFlight flight) {
+    public ArrayList<Airline> addFlight(String airlineName, Flight flight) {
+        System.out.println("add Flight");
 
-        boolean airlineExists = false;
+        Airline airline = airlineDatabase.get(airlineName);
 
-        ArrayList<AbstractAirline> abstractAirlines = new ArrayList<>();
-
-        if (airlineDatabase.containsValue(airline)) {
-            for (Map.Entry<String, AbstractAirline> airlineEntry: airlineDatabase.entrySet()) {
-                abstractAirlines.add(airlineEntry.getValue());
-            }
-            for (AbstractAirline abstractAirline: abstractAirlines) {
-                if (abstractAirline.getName().equalsIgnoreCase(airline.getName())) {
-                    abstractAirline.addFlight(flight);
-                    return abstractAirlines;
-                }
-            }
+        // if airline does not exist
+        if (airline == null) {
+            System.out.println("airline is null");
+            airline = new Airline(airlineName);
         }
 
+        System.out.println("adding a new flight");
         airline.addFlight(flight);
-        airlineDatabase.put(airline.getName(), airline);
-        for (Map.Entry<String, AbstractAirline> airlineEntry: airlineDatabase.entrySet()) {
-            abstractAirlines.add(airlineEntry.getValue());
-        }
+        airlineDatabase.put(airlineName, airline);
 
-        return abstractAirlines;
-/*
-        if (airlineDatabase.contains(airline)) {
-            for (AbstractAirline abstractAirline: airlineDatabase) {
-                if (abstractAirline.getName().equalsIgnoreCase(airline.getName())) {
+        System.out.println("flight added?");
 
-                    airline.addFlight(flight);
-                    airlineDatabase.add(airline);
-                }
-            }
-        }
-        else {
-            airline.addFlight(flight);
-            airlineDatabase.add(airline);
-        }
+        // airline does exist
+        ArrayList<Airline> airlineList = new ArrayList<>();
+        airlineList.addAll(airlineDatabase.values());
 
-        return airlineDatabase;*/
+        System.out.println("airlineList made with values");
+
+        System.out.println(airlineList.toString());
+
+        return airlineList;
     }
 
+    /**
+     * perform a search for find the matched flights
+     * @param airlineName name of the airline
+     * @param src   source airport
+     * @param dest  destination airport
+     * @return returns the airline with matched flights
+     */
     @Override
-    public Airline search(String airlineName, String src, String dest) {
-        AbstractAirline airline = new Airline();
+    public String search(String airlineName, String src, String dest) {
+        Airline airline = null;
 
         if (airlineDatabase.containsKey(airlineName)) {
             airline = airlineDatabase.get(airlineName);
-            Collection<AbstractFlight> abstractFlights = airline.getFlights();
-            for (AbstractFlight flight: abstractFlights) {
-                if (flight.getSource().equalsIgnoreCase(src) && flight.getDestination().equalsIgnoreCase(dest)){
-                    return ((Airline) airline);
-                }
-
-            }
+            return prettySearch(airline, src, dest);
         }
 
-       /* if (!airlineDatabase.isEmpty()) {
-            if (airlineDatabase.contains(airline)) {
-                for (AbstractAirline abc : airlineDatabase) {
-                    if (abc.getName().equalsIgnoreCase(airlineName)) {
-                        return ((Airline) abc);
-                    }*/
-                    // sb.append(abc.getFlights().toString());
-                /*if (abc.getName().equalsIgnoreCase(airlineName)) {
-                    for (Object f : abc.getFlights()) {
-
-                        if (((Flight) f).getSource().equalsIgnoreCase(src) &&
-                                ((Flight) f).getDestination().equalsIgnoreCase(dest)) {
-                            //airline.addFlight(((Flight) f));
-                            return ((Flight) f).getNumber() + ((Flight) f).getSource() + ((Flight) f).getDepartureString();
-                        }
-                    }
-                }*/
-
-        return ((Airline) airline);
+        return airlineName + " does not exist";
     }
 
+    /**
+     * pretty print the search results
+     * @param airline name of the airline
+     * @param s  name of the source airport
+     * @param d  name of the destination airport
+     * @return returns the airline with flights
+     */
     private String prettySearch(Airline airline, String s, String d)
     {
         Collection<Flight> Flights;
         Flights = airline.getFlights();
-        StringBuilder sb = new StringBuilder();
+        String match = "";
+        String howMany = "";
+        int count = 0;
 
         boolean found = false;
         if (Flights.isEmpty()) {
@@ -134,22 +106,34 @@ public class AirlineServiceImpl extends RemoteServiceServlet implements AirlineS
             return null;
         }
 
-        sb.append("Airline " + airline.toString() + "\n");
+
         for (Flight flight: Flights) {
             if (flight.getSource().compareToIgnoreCase(s) == 0 && flight.getDestination().compareToIgnoreCase(d) == 0) {
-                sb.append("Flight " + flight.getNumber());
-                sb.append(" Departs " + flight.getSrcCode());
-                sb.append(" at " + flight.getDepartNice());
-                sb.append(" Arrives " + flight.getDestCode());
-                sb.append(" at " + flight.getArrivalNice() + ". Duration: " + flight.getDuration() + " minutes\n");
+                match += ("Flight " + flight.getNumber());
+                match += (" Departs " + flight.getSrcCode());
+                match += (" at " + flight.getDepartNice());
+                match += (" Arrives " + flight.getDestCode());
+                match += (" at "  + flight.getArrivalNice() + ". Duration: " + flight.getDuration() + " minutes\n");
                 found = true;
+                count++;
             }
         }
         if (!found) {
-            sb.append("There are no flights that originate at \'" + s + "\' airport and terminate at \'" + d + "\'");
+            match += ("There are no flights that originate at " + s + " and terminate at " + d);
         }
-        return sb.toString();
+        else {
+            howMany += "\nFound " + count + " flight(s) that Originate at " + s + " and terminate at " + d;
+
+        }
+        howMany += "\n" + match;
+        System.out.println("in pretty search " + match);
+        return howMany;
     }
+
+    /**
+     * throw an exception if something goes wrong at server side
+     * @param throwable to throw
+     */
 
     @Override
     protected void doUnexpectedFailure(Throwable throwable) {

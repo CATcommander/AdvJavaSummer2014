@@ -1,5 +1,6 @@
 package edu.pdx.cs410J.singh2.client;
 
+import com.google.gwt.i18n.client.DefaultDateTimeFormatInfo;
 import edu.pdx.cs410J.AbstractFlight;
 import edu.pdx.cs410J.AirportNames;
 
@@ -60,7 +61,7 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      */
     @Override
     public Date getDeparture() {
-        DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm a");
+        DateTimeFormat dateTimeFormat = new DateTimeFormat("MM/dd/yyyy hh:mm a", new DefaultDateTimeFormatInfo()){};
 
         Date date = dateTimeFormat.parse(departTime);
 
@@ -73,9 +74,10 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * returns validated DateFormat Arrival string
      */
     public String getDepartureString() {
-        DateTimeFormat format = DateTimeFormat.getFormat("MM/dd/yyyy h:mm a");
+        //DateTimeFormat format = DateTimeFormat.getFormat("MM/dd/yyyy h:mm a");
+        DateTimeFormat dateTimeFormat = new DateTimeFormat("MM/dd/yyyy hh:mm a", new DefaultDateTimeFormatInfo()){};
 
-        return format.format(this.getDeparture());
+        return dateTimeFormat.format(this.getDeparture());
     }
     /**
      * Just returns the name of flight's departure airport
@@ -115,9 +117,10 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * @return Date Format LONG String
      */
     public String getDepartNice() {
-        DateTimeFormat format = DateTimeFormat.getFormat("EEE, MMM d, yyyy h:mm a");
+       // DateTimeFormat format = DateTimeFormat.getFormat("EEE, MMM d, yyyy h:mm a");
+        DateTimeFormat dateTimeFormat = new DateTimeFormat("EEE, MMM d, yyyy hh:mm a", new DefaultDateTimeFormatInfo()){};
 
-        return format.format(this.getDeparture());
+        return dateTimeFormat.format(this.getDeparture());
     }
     /**
      * returns full airport code
@@ -135,7 +138,8 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      */
     @Override
     public Date getArrival() {
-        DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm a");
+       // DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm a");
+        DateTimeFormat dateTimeFormat = new DateTimeFormat("MM/dd/yyyy hh:mm a", new DefaultDateTimeFormatInfo()){};
 
         Date date = dateTimeFormat.parse(arriveTime);
 
@@ -148,17 +152,19 @@ public class Flight extends AbstractFlight implements Comparable<Flight> {
      * returns validated DateFormat Arrival string
      */
     public String getArrivalString() {
-        DateTimeFormat format = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm a");
+       // DateTimeFormat format = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm a");
+        DateTimeFormat dateTimeFormat = new DateTimeFormat("MM/dd/yyyy hh:mm a", new DefaultDateTimeFormatInfo()){};
 
-        return format.format(this.getArrival());
+        return dateTimeFormat.format(this.getArrival());
     }
     /**
      * returns Date Format LONG String
      * @return Date Format LONG String
      */
     public String getArrivalNice() {
-        DateTimeFormat format = DateTimeFormat.getFormat("EEE, MMM d, yyyy h:mm a");
-        return format.format(this.getArrival());
+        DateTimeFormat dateTimeFormat = new DateTimeFormat("EEE, MMM d, yyyy hh:mm a", new DefaultDateTimeFormatInfo()){};
+
+        return dateTimeFormat.format(this.getArrival());
     }
     /**
      * get duration in minutes

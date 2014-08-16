@@ -17,14 +17,18 @@
 
 .textBox {
     background-color: white;
-    border: 1px solid orange;
+    border: 1px solid lightblue;
+}
+
+.search {
+    background-color: crimson;
 }
 
 .greenButton {
     background-color: green;
     font-family: sans-serif;
     color: white;
-    font-weight: bold;
+    font-weight: bolder;
     text-transform: uppercase;
 }
 

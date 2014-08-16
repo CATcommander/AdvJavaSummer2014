@@ -12,7 +12,7 @@
 
   <servlet-mapping>
     <servlet-name>airlineServlet</servlet-name>
-    <url-pattern>/airline/airline</url-pattern>
+    <url-pattern>/airline/airlineServlet</url-pattern>
   </servlet-mapping>
 
   <!-- Default page to serve -->

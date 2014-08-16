@@ -11,10 +11,26 @@ import java.util.ArrayList;
  */
 public interface AirlineServiceAsync {
 
-    void addFlight(AbstractAirline abstractAirline, AbstractFlight flight, AsyncCallback<ArrayList<AbstractAirline>> asyncCallback);
-    void search(String airlineName, String src, String dest, AsyncCallback<Airline> async);
+    /**
+     * add a flight with airline
+     * @param airlineName name of the airline
+     * @param flight  flight to add
+     * @param async  async callback to talk to server
+     */
+    void addFlight(String airlineName, Flight flight, AsyncCallback<ArrayList<Airline>> async);
 
-    void displayAll(AsyncCallback<ArrayList<AbstractAirline>> async);
+    /**
+     * perform a search on the server side
+     * @param airlineName name of the airline
+     * @param src  source airport
+     * @param dest destination airport
+     * @param async  async callback to talk to server
+     */
+    void search(String airlineName, String src, String dest, AsyncCallback<String> async);
 
-   // void search(String airlineName, String src, String dest, AsyncCallback<String> async);
+    /**
+     * function to display all the flights
+     * @param async async callback to talk to server
+     */
+    void displayAll(AsyncCallback<ArrayList<Airline>> async);
 }

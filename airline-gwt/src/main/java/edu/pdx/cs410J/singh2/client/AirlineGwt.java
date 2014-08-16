@@ -39,6 +39,7 @@ public class AirlineGwt implements EntryPoint {
     private Button clear = new Button("Clear");
     private Button displayAll = new Button("Display All");
 
+
     public void onModuleLoad() {
 
         Command helpCommand = new Command() {
@@ -235,34 +236,31 @@ public class AirlineGwt implements EntryPoint {
             @Override
             public void onClick(ClickEvent event) {
                 AirlineServiceAsync serviceAsync = GWT.create(AirlineService.class);
-                serviceAsync.displayAll(new AsyncCallback<ArrayList<AbstractAirline>>() {
+                serviceAsync.displayAll(new AsyncCallback<ArrayList<Airline>>() {
                     @Override
                     public void onFailure(Throwable caught) {
                         Window.alert(caught.getMessage());
                     }
 
                     @Override
-                    public void onSuccess(ArrayList<AbstractAirline> result) {
+                    public void onSuccess(ArrayList<Airline> result) {
                         int row = 1;
-                        int column = 0;
 
                         for (AbstractAirline absAirline: result) {
 
                             Collection<Flight> f = absAirline.getFlights();
-                            flexTable.setText(row, column++, absAirline.getName());
 
                             for (Flight flight1: f) {
-
-                                flexTable.setText(row, column++, Integer.toString(flight1.getNumber()));
-                                flexTable.setText(row, column++, flight1.getSrcCode());
-                                flexTable.setText(row, column++, flight1.getDepartNice());
-                                flexTable.setText(row, column++, flight1.getDestCode());
-                                flexTable.setText(row, column++, flight1.getArrivalNice());
-                                flexTable.setText(row, column++, Integer.toString(((int) flight1.getDuration())));
+                                flexTable.setText(row, 0, absAirline.getName());
+                                flexTable.setText(row, 1, Integer.toString(flight1.getNumber()));
+                                flexTable.setText(row, 2,flight1.getSrcCode());
+                                flexTable.setText(row, 3, flight1.getDepartNice());
+                                flexTable.setText(row, 4, flight1.getDestCode());
+                                flexTable.setText(row, 5, flight1.getArrivalNice());
+                                flexTable.setText(row, 6, Integer.toString(((int) flight1.getDuration())));
+                                row++;
                             }
 
-                            row++;
-                            column = 0;
                         }
                     }
                 });
@@ -352,42 +350,41 @@ public class AirlineGwt implements EntryPoint {
                     if (!validateDateAndTime(arriveFullDate))
                         return;
 
-                    final Airline airline = new Airline(airlineName);
-                    final AbstractFlight flight = new Flight(flightNumber, departAirport, departFullDate, arriveAirport, arriveFullDate);
+                    Flight flight = new Flight(flightNumber, departAirport, departFullDate, arriveAirport, arriveFullDate);
 
                     final AirlineServiceAsync async = GWT.create(AirlineService.class);
-                    async.addFlight(airline, flight, new AsyncCallback<ArrayList<AbstractAirline>>() {
+                    AsyncCallback<ArrayList<Airline>> callback = new AsyncCallback<ArrayList<Airline>>() {
+
                         @Override
                         public void onFailure(Throwable caught) {
                             Window.alert(caught.getMessage());
                         }
-                        int row = 1;
-                        int column = 0;
 
                         @Override
-                        public void onSuccess(ArrayList<AbstractAirline> result) {
+                        public void onSuccess(ArrayList<Airline> result) {
+
+                            int row = 1;
 
                             for (AbstractAirline absAirline: result) {
+
                                 Collection<Flight> f = absAirline.getFlights();
-                                flexTable.setText(row, column++, absAirline.getName());
 
                                 for (Flight flight1: f) {
-
-                                    flexTable.setText(row, column++, Integer.toString(flight1.getNumber()));
-                                    flexTable.setText(row, column++,flight1.getSrcCode());
-                                    flexTable.setText(row, column++, flight1.getDepartNice());
-                                    flexTable.setText(row, column++, flight1.getDestCode());
-                                    flexTable.setText(row, column++, flight1.getArrivalNice());
-                                    flexTable.setText(row, column++, Integer.toString(((int) flight1.getDuration())));
-
+                                    flexTable.setText(row, 0, absAirline.getName());
+                                    flexTable.setText(row, 1, Integer.toString(flight1.getNumber()));
+                                    flexTable.setText(row, 2,flight1.getSrcCode());
+                                    flexTable.setText(row, 3, flight1.getDepartNice());
+                                    flexTable.setText(row, 4, flight1.getDestCode());
+                                    flexTable.setText(row, 5, flight1.getArrivalNice());
+                                    flexTable.setText(row, 6, Integer.toString(((int) flight1.getDuration())));
+                                    row++;
                                 }
-                                row++;
-                                column = 0;
-
-                                //flexTable.setText(row, column, prettyPrint(((Airline) absAirline)).toString());
                             }
                         }
-                    });
+                    };
+
+                    async.addFlight(airlineName, flight, callback);
+
                 }
                 else if (dropBox.getItemText(dropBox.getSelectedIndex()).equalsIgnoreCase("Search for Flight")) {
 
@@ -424,23 +421,15 @@ public class AirlineGwt implements EntryPoint {
 
                     final AirlineServiceAsync serviceAsync = GWT.create(AirlineService.class);
 
-                    serviceAsync.search(airlineName, departAirport, arriveAirport, new AsyncCallback<Airline>() {
+                    serviceAsync.search(airlineName, departAirport, arriveAirport, new AsyncCallback<String>() {
                         @Override
                         public void onFailure(Throwable caught) {
                             Window.alert(caught.getMessage());
                         }
 
                         @Override
-                        public void onSuccess(Airline result) {
-                            StringBuilder stringBuilder = new StringBuilder();
-
-                            Collection<Flight> flights = result.getFlights();
-                            for (Flight flight: flights) {
-                                stringBuilder.append(prettyPrint(result));
-                                Window.alert("inside for loop " + flight.toString());
-                            }
-                            Window.alert("search func" + stringBuilder.toString());
-                            //Window.alert("prety print " + prettyPrint(result).toString());
+                        public void onSuccess(String result) {
+                           Window.alert(result);
                         }
                     });
                 }
@@ -472,6 +461,12 @@ public class AirlineGwt implements EntryPoint {
 
     }
 
+    /**
+     * make a new label with labelName
+     * @param labelName
+     *        name of the label
+     * @return label
+     */
     private Label makeNewLabel(String labelName) {
         Label label = new Label(labelName);
         label.setStyleName("label");
@@ -479,32 +474,14 @@ public class AirlineGwt implements EntryPoint {
 
         return label;
     }
-    private StringBuilder prettyPrint(Airline airline) {
 
-
-        Collection<Flight> flightList;
-        flightList = airline.getFlights();
-
-        StringBuilder stringBuilder = new StringBuilder();
-
-        if (flightList == null) {
-            Window.alert("Empty Airline List");
-            return null;
-        }
-        stringBuilder.append("\nAirline " + airline.toString() + "\n");
-        // 432 Portland OR, Sat Dec 27, 2010 1:22 PST LAX etc
-        for (Flight flight : flightList) {
-
-            stringBuilder.append("Flight " + flight.getNumber());
-            stringBuilder.append(" Departs " + flight.getSrcCode());
-            stringBuilder.append(" at " + flight.getDepartNice());
-            stringBuilder.append(" Arrives " + flight.getDestCode());
-            stringBuilder.append(" at " + flight.getArrivalNice() + ". Duration: " + flight.getDuration() + " minutes\n");
-        }
-
-        return stringBuilder;
-    }
-
+    /**
+     * make a new textBox with placeholder
+     * @param placeholder
+     *        placeholder in text box
+     * @return  return new text box
+     *
+     */
     private TextBox makeTextBoxWithLabel(String placeholder) {
         TextBox textBox = new TextBox();
         VerticalPanel panel = new VerticalPanel();
@@ -519,6 +496,11 @@ public class AirlineGwt implements EntryPoint {
         return textBox;
     }
 
+    /**
+     * sets the header for flextable
+     * @param flexTable
+     *        printing header to flextable
+     */
     private void setAirlineHeader(FlexTable flexTable) {
         flexTable.setCellPadding(4);
         flexTable.setBorderWidth(1);
